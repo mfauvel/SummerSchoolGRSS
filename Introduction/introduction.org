@@ -1,0 +1,767 @@
+#+TITLE: Introduction to hyperspectral remote sensing imagery
+#+SUBTITLE: GRSS Summer School
+#+AUTHOR: Mathieu Fauvel
+#+EMAIL: mathieu.fauvel@ensat.fr
+#+DATE: [2017-04-26 Wed 08:30-10:00]
+
+#+INCLUDE_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+LANGUAGE: en
+#+OPTIONS: H:3 toc:t tags:nil properties:nil
+
+#+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM
+
+#+LaTeX_CLASS_OPTIONS: [10pt,aspectratio=1610]
+
+#+BEAMER_THEME: DarkConsole
+#+BEAMER_HEADER: \institute{UMR Dynafor}
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \setbeamercovered{again covered={\opaqueness<1->{25}}}
+#+BEAMER_HEADER: \usefonttheme[onlymath]{serif}
+
+#+LATEX_HEADER: \usepackage[english]{babel}\usepackage{etex}
+#+LATEX_HEADER: \usepackage{tikz}\usepackage{amsmath}\usepackage[T1]{fontenc}\usepackage{lmodern}%\usepackage{arev}
+#+LATEX_HEADER: \usepackage{booktabs}\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
+#+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
+#+LATEX_HEADER: \addbibresource{intro.bib}
+#+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
+
+
+# Color definition
+#+LATEX_HEADER:\definecolor{c1}{rgb}{0,0,0.562}
+#+LATEX_HEADER:\definecolor{c2}{rgb}{0,0,0.875}
+#+LATEX_HEADER:\definecolor{c3}{rgb}{0,0.25,1}
+#+LATEX_HEADER:\definecolor{c4}{rgb}{0,0.625,1}
+#+LATEX_HEADER:\definecolor{c5}{rgb}{0,1,1}
+#+LATEX_HEADER:\definecolor{c6}{rgb}{0.375,1,0.625}
+#+LATEX_HEADER:\definecolor{c7}{rgb}{0.688,1,0.312}
+#+LATEX_HEADER:\definecolor{c8}{rgb}{1,0.938,0}
+#+LATEX_HEADER:\definecolor{c9}{rgb}{1,0.562,0}
+#+LATEX_HEADER:\definecolor{c10}{rgb}{1,0.188,0}
+#+LATEX_HEADER:\definecolor{c11}{rgb}{0.812,0,0}
+#+LATEX_HEADER:\definecolor{c12}{rgb}{0.5,0,0}
+
+
+*** Mathieu Fauvel                                                 :export:
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tabular}{ccc}
+  \includegraphics[width=0.3\linewidth]{figures/logo-INRA-transp.png}
+  &\includegraphics[width=0.3\linewidth]{figures/logoUT.pdf}
+  &\includegraphics[width=0.3\linewidth]{figures/inp-ensat.jpg}
+\end{tabular}
+\end{center}
+
+#+END_EXPORT
+- Associate professor at  [[http://ensat.fr/][ENSAT]] - [[http://inp-toulouse.fr/][INP Toulouse]] & [[http://www.univ-toulouse.fr/][University of Toulouse]]
+- Director of the Engineering and Digital Sciences Department at the National Institute of Agronomy of Toulouse (ENSAT).
+- Associated to the [[http://dynafor.toulouse.inra.fr/][DYNAFOR]] lab
+- IEEE GRSS:
+  + Senior Member
+  + Member of the /GRSS Chapter Committee/
+  + IEEE JSTARS Associated Editor 
+* Introduction                                                       :export:
+:PROPERTIES:
+:Effort:   15
+:END:
+*** Remote sensing
+**** Images                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width \linewidth
+file:./figures/remote_sensing_acquisition.png
+/Image taken from cite:974727/.
+**** Definition                                                    :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Remote   sensing  provides   information   about  landscapes.
+- This information is carried out by the /electromagnetic energy/ and is
+  usually formated in terms of /digital image data/.
+- This information can be used
+  + To /update/ and to /supervise/ landscapes in known areas,
+  + To /get prior/ information about landscapes of unknown areas.
+*** Fields of application
+:PROPERTIES:
+:BEAMER_opt: fragile
+:END:
+#+BEGIN_EXPORT latex
+\tikzset{grow cyclic list/.code={%
+  \def\tikzgrowthpositions{{#1}}%
+  \foreach \n [count=\i,remember=\i]in {#1}{}%
+  \let\tikzgrowthpositionscount=\i%
+  \tikzset{growth function=\tikzgrowcycliclist}}}
+\def\tikzgrowcycliclist{%
+  \pgftransformshift{%
+    \pgfpointpolar{\tikzgrowthpositions[mod(\the\tikznumberofcurrentchild-1,\tikzgrowthpositionscount)]}%
+      {\the\tikzleveldistance}}}
+\begin{center}
+\resizebox{0.75\textwidth}{!}{
+  \begin{tikzpicture}[<->,mindmap,every node/.append style={concept,execute at begin node=\hskip0pt},grow cyclic,
+    level 1/.append style={level distance=4.25cm,sibling angle=72,every child/.append style={concept color=black,text=white,font=\bfseries}},%
+    level 2/.append style={level distance=3cm,every child/.append style={concept color=gray!75,text=black,font=\small},sibling angle=45},%sibling angle=45
+    root concept/.append style={concept color=black, fill=white, line width=1ex, text=black,font=\large},
+    ]
+    \node [root concept] (hyper) {\textsc{Hyperspectral}\\ \textsc{Images}}[grow cyclic list={45,-25,-150,115,-100,164}] 
+    child { node  (lm) {Land\\ management}[clockwise from=90]
+      child {node (biomass) {Biomass}}
+      child {node (biodiversity) {Biodiversity}}
+      child {node (lulc) {Land use/land cover}}
+      child {node (cd) {Change detection}}
+    }
+    child {node (geology) {Geology}[clockwise from=15]
+      child {node (det) {Mineral detection}}
+      child {node (soil) {Soil composition}}
+    }
+    child {node (pa) {Precision agriculture}[clockwise from=-120]
+      child {node (ns) {Nutrient stress}}
+      child {node (ws) {Water stress}}
+      child {node (pp) {Plant pathogens}}
+    }
+    child {node (hydrology) {Hydrology}[clockwise from=180]
+      child {node (wq) {Water quality}}
+      child {node (coast) {Costal zone}}
+    }
+    child {node (military) {Military}[clockwise from=0]
+      child {node (target) {Target detection}}
+    }
+    child[level distance= 6cm] {node (urban) {Urban}[clockwise from=180]
+      child {node (target) {Polution}}
+      child {node (target) {Vegation mapping}}
+    };
+    \end{tikzpicture}}
+\end{center}
+#+END_EXPORT
+*** Hekla Volcano, Iceland
+**** Original                                                      :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+ATTR_LATEX: :width \linewidth
+[[file:figures/hekla_original.jpg]]
+**** Classif                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.45
+:END:
+#+ATTR_LATEX: :width \linewidth
+[[file:figures/hekla_classif.jpg]]
+
+**** Classes
+:PROPERTIES:
+:BEAMER_env(Env): ignoreheading
+:END:
+#+BEGIN_EXPORT latex
+\textcolor{c1}{Lava 1970}, \textcolor{c2}{Lava 1980 I},  \textcolor{c3}{Lava 1980 II},  \textcolor{c4}{Lava 1991 I}, \textcolor{c5}{Lava 1991 II}, \textcolor{c6}{Lava moss cover}, \textcolor{c7}{hyaloclastite formation}, \textcolor{c8}{Tephra lava}, \textcolor{c9}{Rhyolite}, \textcolor{c10}{Scoria}, \textcolor{c11}{Firn-glacier ice}, \textcolor{c12}{Snow}.
+#+END_EXPORT
+
+* Hyperspectral imagery                                              :export:
+:PROPERTIES:
+:Effort:   30
+:END:
+** Element of physics
+*** Electromagnetic wave
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}[samples=100]
+  \filldraw[domain=0:2*pi,color=blue,fill=blue!30] plot (\x,0,{2*sin(\x*2 r)});
+  \filldraw[domain=0:2*pi,color=red,fill=red!30] plot (\x,{sin(\x*2 r)},0);
+  \foreach \x in {0.25,0.5,...,6}
+  {
+    \draw[color=blue!75,->,thick] (\x,0,0) -- (\x,0,{2*sin(2*\x r)});
+    \draw[color=red!75,->,thick] (\x,0,0) -- (\x,{sin(2*\x r)},0);
+  }
+  \draw[thick,->] (0,0,0) -- (2*pi+0.5,0,0) node[below, pos=0.95] {x} node[right] {\small Direction};
+  \draw[thick,->] (0,0,0) -- (0,1.5,0) node[left] {$\vec{B}$};
+  \draw[thick,->] (0,0,0) -- (0,0,2) node[below] {$\vec{E}$};
+  \draw[<->,dashed] (pi/4,1.05,0) -- (5*pi/4,1.05,0) node[midway,above] {$\lambda$};
+\end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+- An electromagnetic wave is a pertubation of the electric and magnetic field which propagates throught space.
+- $\vec{E}$: Electric field. $\vec{B}$: Magnetic field.
+- *Wavelength* ($\lambda$): /Minimal distance between 2 points of the   space for which $\vec{E}$ and $\vec{B}$ recover the same values./
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}[samples=200,domain=0:2*pi]
+  \draw[blue,thick,->] plot (\x,{sin(\x*2 r)})node[right] {$\lambda_{470}$};
+  \draw[green,thick,->] plot(\x,{sin(\x*2/1.5 r)})node[right] {$\lambda_{545}$};
+  \draw[red,thick,->] plot (\x,{sin(\x*2/2.5 r)}) node[right] {$\lambda_{740}$};
+  \draw[thick,->] (0,-1.5) -- (2*pi+0.5,-1.5) node[below] {x};
+\end{tikzpicture}
+\end{center}
+
+#+END_EXPORT
+*** Electromagnetic spectrum
+#+ATTR_LATEX: :width 0.8\linewidth :centering :options angle=-1
+[[file:./figures/spectralInformation.pdf]]
+
+From cite:manolakis2016hyperspectral.
+*** Spectral reflectance
+*Reflectance*: 
+- Capacity of a given surface to reflect the incident light,
+- It is specific to each material.
+
+**** Image  :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:END:
+[[file:./figures/grss_image.png]]
+**** Profile :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[small,grid,width=\linewidth,height=0.55\textheight,thick,xmin=410,xmax=995,legend pos=north west,legend style={font=\footnotesize}]
+      \addplot[mark=none] table [x=X,y=P1,col sep=comma] {figures/pixels.csv};
+      \addplot[mark=none,blue] table [x=X,y=P2,col sep=comma] {figures/pixels.csv};
+      \addplot[mark=none,red] table [x=X,y=P3,col sep=comma] {figures/pixels.csv};
+      \addplot[mark=none,orange] table [x=X,y=P4,col sep=comma] {figures/pixels.csv};
+      \addplot[mark=none,magenta] table [x=X,y=P5,col sep=comma] {figures/pixels.csv};
+      \legend{1,2,3,4,5}
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Spectral reflectance curves
+*Spectral reflectance curves or spectral signature*: Radiometric identity card
+
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[xmin=0.4,xmax=2.5,ymin=0,ymax=1,grid,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance,width=0.9\linewidth,height=0.5\linewidth,cycle list name=color list]
+  \addplot+[mark=none,thick,smooth] file {figures/oak.txt};
+  \pgfplotstableread{figures/grass.txt}\loadedtable
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=grass] from \loadedtable;
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=drygrass] from \loadedtable;
+  \pgfplotstableread{figures/talc.txt}\loadtable
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=talc] from \loadtable;
+  \legend{Oak,Grass, Dry-Grass, Talc}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+#+END_EXPORT
+** Digital remote sensing images
+*** Remote sensing images
+
+/A  remote sensing  image  is a  sampling of  a  spatial, spectral  and
+temporel process/.
+
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}[spy using outlines={circle, magnification=3, size=1.75cm, connect spies}]
+      \visible<1>{\node at (-4,0) {\includegraphics[width=4cm]{figures/46.jpg}};
+      \node at (-1.25,-2.5) {\begin{axis}[xmin=407,xmax=985,ymin=0,ymax=1,grid,width=5cm,height=3cm,footnotesize,axis x line=left,axis y line=left]
+        \addplot[thick,smooth] file {figures/spectre_full.txt};
+      \end{axis}};}
+      \visible<2>{\node at (-4,0) {\includegraphics[width=4cm]{figures/46_8.jpg}};
+        \draw[very thin] (-6,-2) grid[step = 0.125] (-2,2);        
+        \node at (-1.25,-2.5) {\begin{axis}[xmin=407,xmax=985,ymin=0,ymax=1,grid,width=5cm,height=3cm,footnotesize,axis x line=left,axis y line=left]
+            \addplot[thick,smooth] file {figures/spectre_8.txt};
+          \end{axis}}; 
+      } 
+      \visible<3-4>{\node at (-4,0) {\includegraphics[width=4cm]{figures/46_8.jpg}};
+        \draw[very thin] (-6,-2) grid[step = 0.125] (-2,2);
+        \node at (-1.25,-2.5) {\begin{axis}[xmin=407,xmax=985,ymin=0,ymax=1,grid,width=5cm,height=3cm,footnotesize,axis x line=left,axis y line=left]
+            \addplot[thick,mark=*,only marks] file {figures/spectre_ss.txt};
+          \end{axis}};
+      }
+      \visible<4>{\draw[->,line width= 1pt] (-6.2,-3.5) -- (5.75,-3.5) node[above] {$t$};
+        \foreach \x / \xtext in {-6/January,-5/February,-4/March,-3/April,-2/May,-1/June,0/Jully,1/\textcolor{red}{August},2/September,3/October,4/November,5/December}{
+          \fill (\x,-3.5) circle [radius=2pt];
+          \node at (\x,-4) {\rotatebox{30}{\footnotesize\xtext}};
+        }
+      }
+      \spy [gray] on (-4.5,1.5) in node [left] at (0.5,1.5);
+      \fill[gray] (-4.46,1.53) circle (0.02);
+      \fill[white] (4,0) rectangle +(0.04,0.04);
+    \end{tikzpicture}
+  \end{center}
+
+#+END_EXPORT
+*** Characteristics of remote sensing images
+- Spatial resolution: /Ability to distinguish two closed objects/.
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tabular}{cc}
+      \begin{tikzpicture}[thick,scale=0.5,gray]
+      \draw (0,0) -- (2,0) -- (2,2) -- (0,2) -- (0,0);    
+      \end{tikzpicture}
+      &
+        \begin{tikzpicture}[thick,scale=0.5,gray]
+          \draw (0,0) -- (2,0) -- (2,2) -- (0,2) -- (0,0);
+          \draw (1,0) -- (1,2);
+          \draw (0,1) -- (2,1);
+        \end{tikzpicture}\\
+      2 m/pixel & 1m/pixel
+    \end{tabular}
+  \end{center}
+  #+END_EXPORT
+- Radiometric resolution: /Smallest difference in intensity that the sensor can record/.
+  #+ATTR_LATEX: :booktabs t
+  | Coding  | Quantification | Exemple: 6.666666 |
+  |---------+----------------+-------------------|
+  | 8 bits  |            256 |                 7 |
+  | 16 bits |          65536 |              6.67 |
+
+- _Spectral resolution_: /Width of each band of the spectrum that can be collected/.
+  #+ATTR_LATEX: :booktabs t :align {lc}
+  | Image Type    | Number of bands |
+  |---------------+-----------------|
+  | Panchromatic  | 1               |
+  | Multispectral | ~ 10            |
+  |---------------+-----------------|
+  | Hyperspectral | > 100           |
+  | Ultraspectral | > 100           |
+- Spatial and spectral  resolution are linked: difficult  to have high
+  spatial /and/ spectral resolution at the same time.
+*** Multispectral versus hyperspectral
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}[]
+  \begin{axis}[,xmin=0.4,xmax=2.56,ymin=0,ymax=0.6,grid=both,width=0.9\linewidth,height=0.8\textheight,title=Pleiade versus Hypxim]
+    \pgfplotstableread{figures/peuplier_hypxim.txt}\loadedtable
+    \addplot+[mark=none,blue,very thick,smooth] table[x=Wavelength,y=A] from \loadedtable;
+    \pgfplotstableread{figures/peuplier_pleiades.txt}\loadedtable
+    \addplot+[mark=*,very thick,red] table[x=Wavelength,y=A] from \loadedtable;
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Hyperspectral sensors
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+  \begin{semilogxaxis}[grid=both,xlabel= \small Spatial resolution (in meters per pixel),ylabel=\small Number of spectral channels,legend style={cells={anchor=east},legend pos=outer north east,},width=0.9\linewidth,height=0.95\textheight,xmax=1300,ymin=0,ymax=320,every node near coord/.append style={font=\small}]      
+    \addplot[color=red,scatter,mark size=3,only marks, nodes near coords*={\mysensor},visualization depends on={value\thisrow{sensor}\as\mysensor}] table[x=spa,y=ns,col sep=comma]{figures/table_sensor_airplaine.csv};
+    \addplot[color=blue,scatter,mark size=3,only marks, nodes near coords*={\mysensor},visualization depends on={value\thisrow{sensor}\as\mysensor}] table[x=spa,y=ns,col sep=comma]{figures/table_sensor_satellite.csv};
+    \end{semilogxaxis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+** Spectral signatures
+*** Vegetation 1/2
+Healthy vegetation (high photosynthesis)
+- Absorption in /blue/ and /red/ domain,
+- /Visible/ to /near infrared/: increase of the reflectance,
+- /Mid infrared/: depends on the free water in the leafs.
+
+#+ATTR_LATEX: :width 0.5\linewidth
+[[./figures/spectral_curve_vegetation.jpg]]
+*** Vegetation 2/2
+**** Factor                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.35
+:END:
+Factor modifying the reflectance
+- Leaf thickness,
+- Leaf age,
+- Water content,
+- Nitrogen content,
+- Health condition,
+- ...
+
+**** Image                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.6
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[xmin=0.4,xmax=2.5,ymin=0,ymax=1,grid,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance,width=\linewidth,cycle list name=color list]
+  \pgfplotstableread{figures/grass.txt}\loadedtable
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=grass] from \loadedtable;
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=drygrass] from \loadedtable;
+  \legend{Grass, Dry-Grass}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Water 
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[xmin=400,xmax=2500,ymin=0,ymax=0.1,grid,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance,width=0.9\linewidth,height=0.5\linewidth,cycle list name=color list,/pgf/number format/1000 sep={},/pgf/number format/fixed,]
+      \pgfplotstableread[col sep=comma]{figures/water_spectra.csv}\loadedtable
+      %% 1
+      \addplot+[mark=none,smooth,thick, restrict x to domain=410:1345,forget plot] table[x=wave,y=w1] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1500:1810,forget plot] table[x=wave,y=w1] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1950:2470] table[x=wave,y=w1] from \loadedtable;
+
+      %% 2
+      \addplot+[mark=none,smooth,thick, restrict x to domain=410:1345,forget plot] table[x=wave,y=w2] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1500:1810,forget plot] table[x=wave,y=w2] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1950:2470] table[x=wave,y=w2] from \loadedtable;
+
+      %% 3
+      \addplot+[mark=none,smooth,thick, restrict x to domain=410:1345,forget plot] table[x=wave,y=w3] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1500:1810,forget plot] table[x=wave,y=w3] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1950:2470] table[x=wave,y=w3] from \loadedtable;
+
+      %% 4
+      \addplot+[mark=none,smooth,thick, restrict x to domain=410:1345,forget plot] table[x=wave,y=w4] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1500:1810,forget plot] table[x=wave,y=w4] from \loadedtable;
+      \addplot+[mark=none,smooth,thick, restrict x to domain=1950:2470] table[x=wave,y=w4] from \loadedtable;
+
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Human made materials
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
+    \begin{axis}[grid=both,width=\linewidth,height=0.5\linewidth,xmin=0.350,xmax=2.400,mark=none,/pgf/number format/1000 sep={},/pgf/number format/fixed,thick,ticklabel style = {font=\footnotesize},legend columns=3,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance (\%)]
+      \addplot[] table[x=Wavelength,y=Black rubber,col sep=comma]{figures/manmade_lib.csv};
+      \addplot[red,] table[x=Wavelength,y=Window glass,col sep=comma]{figures/manmade_lib.csv};
+      \addplot[blue,] table[x=Wavelength,y=Slate sonte,col sep=comma]{figures/manmade_lib.csv};
+      \addplot[yellow,] table[x=Wavelength,y=White marble,col sep=comma]{figures/manmade_lib.csv};
+      \addplot[orange,] table[x=Wavelength,y=Fiberglass,col sep=comma]{figures/manmade_lib.csv};
+      \addplot[magenta,] table[x=Wavelength,y=Rubberized coating,col sep=comma]{figures/manmade_lib.csv};
+      \legend{Black rubber,Window glass,Slate sonte,White marble,Fiberglass,Rubberized coating}
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+* Current challenges in hyperspectral                                :export:
+:PROPERTIES:
+:Effort:   30
+:END:
+** What is remote sensing made of ?
+*** An interdisciplinary field
+#+BEGIN_EXPORT latex
+\begin{center}
+\smartdiagramset{planet color=orange!60,
+distance planet-satellite=4cm
+}
+\smartdiagram[bubble diagram]
+{\textsc{Hyperspectral}\\ \textsc{Remote Sensing},Computer \\Science,Signal and Image \\ Processing, Pattern \\Recognition, Physics, Environemental\\ Science}
+\end{center}
+#+END_EXPORT
+*** Processing chain
+#+BEGIN_EXPORT latex
+\smartdiagramset{uniform sequence color=true,
+sequence item border color=black,sequence item font size=\small,
+sequence item text color=white,sequence item text width=2.75cm
+}
+\begin{center}
+  \smartdiagram[sequence diagram]{
+    Acquisition, Transmission, Pre-processing, Information extraction}
+\end{center}
+#+END_EXPORT
+- _Transmission_:
+  + Compression.
+- _Pre-processing_:
+  + Geometric and atmospheric corrections,
+  + Data fusion,
+  + Feature extraction.
+- _Information extraction_:
+  + Classification/inversion,
+  + Unmixing,
+  + Target detection.
+
+*** Hot topics
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[date coordinates in=x,xtick=data, ybar,title=Number of published papers per year about "hyperspectral remote sensing" (\emph{ISI Web of science}),width=0.9\linewidth,height=0.9\textheight,grid=both,date ZERO=1999-09-01,xmin=1999-09-01,xmax=2016-05-01,xticklabel style={rotate=45},xticklabel={\year},ymin=0,ymax=800]
+      \addplot coordinates{
+        (2000-01-01,80)
+        (2001-01-01,100)
+        (2002-01-01,125)
+        (2003-01-01,210)
+        (2004-01-01,225)
+        (2005-01-01,195)
+        (2006-01-01,275)
+        (2007-01-01,290)
+        (2008-01-01,270)
+        (2009-01-01,345)
+        (2010-01-01,355)
+        (2011-01-01,360)
+        (2012-01-01,510)
+        (2013-01-01,555)
+        (2014-01-01,640)
+        (2015-01-01,740)
+        (2016-01-01,645)};      
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+** Current challenges
+*** Challenges
+- _Pattern recognition_:
+  + High dimensional data,
+  + Spectral variability,
+  + Reduce ground-thruth.
+- _Computer science_:
+  + Large volume of data,
+  + Real time constraints.
+- _Thematic application_:
+  + Environmental issues,
+  + Military issues,
+  + Astrophysical issues.
+
+*** Spectral variability                                         
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid=both,width=\linewidth,height=0.5\linewidth,xmin=350,xmax=2400,ymin=0,ymax=0.5,mark=none,/pgf/number format/1000 sep={},/pgf/number format/fixed,thick,ticklabel style = {font=\footnotesize},title=Grasslands measurements]
+      %% 1
+      \addplot[restrict x to domain=350:1350] table[x=x,y=y1,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[restrict x to domain=1410:1810] table[x=x,y=y1,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[restrict x to domain=1970:2400] table[x=x,y=y1,col sep=comma]{figures/spectralSamples.csv};
+      %% 2
+      \addplot[red,restrict x to domain=350:1350] table[x=x,y=y2,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[red,restrict x to domain=1410:1810] table[x=x,y=y2,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[red,restrict x to domain=1970:2400] table[x=x,y=y2,col sep=comma]{figures/spectralSamples.csv};
+      %% 3
+      \addplot[blue,restrict x to domain=350:1350] table[x=x,y=y40,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[blue,restrict x to domain=1410:1810] table[x=x,y=y40,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[blue,restrict x to domain=1970:2400] table[x=x,y=y40,col sep=comma]{figures/spectralSamples.csv};
+      %% 4
+      \addplot[orange,restrict x to domain=350:1350] table[x=x,y=y36,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[orange,restrict x to domain=1410:1810] table[x=x,y=y36,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[orange,restrict x to domain=1970:2400] table[x=x,y=y36,col sep=comma]{figures/spectralSamples.csv};
+      %% 5
+      \addplot[green,restrict x to domain=350:1350] table[x=x,y=y50,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[green,restrict x to domain=1410:1810] table[x=x,y=y50,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[green,restrict x to domain=1970:2400] table[x=x,y=y50,col sep=comma]{figures/spectralSamples.csv};
+      %% 6
+      \addplot[yellow,restrict x to domain=350:1350] table[x=x,y=y20,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[yellow,restrict x to domain=1410:1810] table[x=x,y=y20,col sep=comma]{figures/spectralSamples.csv};
+      \addplot[yellow,restrict x to domain=1970:2400] table[x=x,y=y20,col sep=comma]{figures/spectralSamples.csv};
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+
+#+END_EXPORT
+** High dimensional data
+*** Properties of HD spaces 1/3
+- High number of measurements $d$ but limited number $n$ of samples.
+- High dimensional space do not behave as low/moderate dimensional space cite:661089:
+  + Volume of an hypersphere: $V_s(d,r)=\frac{\pi^{d/2}}{\Gamma\left(\frac{d}{2}+1\right)}r^d$,
+  + Volume of an hypercube: $V_c(d,r)=(2r)^d$.
+**** Hypersphere                                                   :BMCOL:
+:PROPERTIES:
+:BEAMER_act: [<2->]
+:BEAMER_col: 0.45
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid=both,xlabel= \small $d$,ylabel= \(V_{s}(d)\),legend style={cells={anchor=east},legend pos=outer north east,},width=0.85\linewidth,xmin=1,xmax=20,ymin=0,ymax=6]      
+    \addplot[mark=*] table[x=d,y=s,col sep=comma]{figures/volHs.csv};
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+**** Hypercube                                                     :BMCOL:
+:PROPERTIES:
+:BEAMER_act: [<3->]
+:BEAMER_col: 0.45
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid=both,xlabel= \small $d$,ylabel=$V_s(d)/V_c(d)$,legend style={cells={anchor=east},legend pos=outer north east,},width=0.85\linewidth,xmin=1,xmax=20,ymin=0,ymax=1]      
+    \addplot[mark=*] table[x=d,y=r,col sep=comma]{figures/volHs.csv};
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+*** Properties of HD spaces 2/3
+Consider                                                             a
+r.v.      $\mathbf{x}\sim\mathcal{N}(\mathbf{0},\mathbf{I})$.      The
+likelihood of $t=\|\mathbf{x}\|$ is given by
+
+#+BEGIN_EXPORT latex
+\begin{eqnarray*}
+  f(t)= \frac{ t^{d-1}\exp(-t^2/2)}{2^{(d/2)-1}\Gamma(d/2)}
+\end{eqnarray*}
+#+END_EXPORT
+which is maximum for $t^*=\sqrt{d-1}$ cite:661089.
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
+    \begin{axis}[grid=both,width=0.9\linewidth,height=0.35\linewidth,xmin=0,xmax=15,mark=none,/pgf/number format/1000 sep={},/pgf/number format/fixed,thick,ticklabel style = {font=\footnotesize},legend columns=6,xlabel=$t$,ylabel=$f(t)$,cycle list name=color list]
+      \addplot+[] table[x=x,y=y1,col sep= comma]{figures/rayleigh.csv};
+      \addplot+[] table[x=x,y=y2,col sep= comma]{figures/rayleigh.csv};
+      \addplot+[] table[x=x,y=y3,col sep= comma]{figures/rayleigh.csv};
+      \addplot+[] table[x=x,y=y4,col sep= comma]{figures/rayleigh.csv};
+      \addplot+[] table[x=x,y=y5,col sep= comma]{figures/rayleigh.csv};
+      \addplot+[] table[x=x,y=y6,col sep= comma]{figures/rayleigh.csv};
+      \legend{$d=1$,$d=5$,$d=10$,$d=20$,$d=50$,$d=100$}
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+*** Properties of HD spaces 3/3
++ *Concentration of measure* phenomenon cite:Aggarwal2001: if $\mathbf{x}$ r.v. with i.i.d variables
+  #+BEGIN_EXPORT latex
+  $$ \frac{d_M(\mathbf{x})-d_m(\mathbf{x})}{d_M(\mathbf{x})}\to_{p} 0$$
+  #+END_EXPORT
+  for all Minkowski norm: \( \|\mathbf{x}\|=\big(\sum_{i=1}^{d}|x_i|^{p} \big)^{1/p} \).
++ From cite:donoho:
+  - Rate of convergence of estimators decreases when $d$ increases,
+  - The number of model parameters increase w.r.t $d$.
+
+*** Consequences for the analysis                              
+- Curse of dimensionality: Number of points to uniformly sample a unit hypercube (step=0.1)
+  #+BEGIN_EXPORT latex
+    \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[xmin=0,xmax=20,width=0.5\linewidth,height=0.25\linewidth,grid=both,axis x line=left ,axis y line=left, tick align=outside,ymode=log]
+        \addplot+[very thick,mark=none,smooth,domain=1:20,samples=20] (\x,{10^(\x)});
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+- Method based on /nearest neighbors/ fail (with Euclidean distance)
+- Hughes phenomenon  cite:hughes: 
+  #+BEGIN_QUOTE
+  "/With a fixed  design pattern sample, recognition  accuracy can first
+  increase as the number of  measurements made on a pattern increases,
+  but  decay  with measurement  complexity  higher  than some  optimum
+  value./"
+  #+END_QUOTE
+- Ill-posed problem:
+  + Matrix inversion,
+  + Determinant,
+  + Overfitting ...
+* Questions                                                          :export:
+:PROPERTIES:
+:Effort:   15
+:END:
+*** Is there a fake ?
+**** Color Image                                               :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <1>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo.pdf]]
+
+**** Bleu Band                                                 :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <2>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo_1.pdf]]
+
+**** Green Band                                                :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <3>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo_2.pdf]]
+
+**** Red Band                                                  :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <4>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo_3.pdf]]
+
+**** Red 2 Band                                                :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <5>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo_4.pdf]]
+
+**** Infra Red band                                            :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: onlyenv
+:BEAMER_act: <6>
+:END:
+#+ATTR_LATEX: :width 0.9\linewidth :centering
+[[file:./figures/demo_5.pdf]]
+
+*** Spectra 
+#+BEGIN_EXPORT latex
+\pgfplotstableread{figures/cotton_spectra.txt}\loadedtable
+\begin{center}
+\begin{tikzpicture}\begin{axis}[xlabel=$\lambda$, ylabel=Reflectance,  xmin=0.4, xmax=2.5, ymin=0,   ymax=1, grid=both,width=0.9\textwidth, height=0.4\textwidth]
+    \addplot[smooth,thick] table[x=wavelength,y=dry] from \loadedtable;
+    \addplot[smooth,thick,red] table[x=wavelength,y=wet] from \loadedtable;
+    \addplot[smooth,thick,blue] table[x=wavelength,y=acid] from \loadedtable;
+    \addplot[smooth,thick,orange] table[x=wavelength,y=apple] from \loadedtable;
+    \legend{a,b,c,d};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+
+#+END_EXPORT
+
+There are two spectra of the same material (cotton), before and after drying. Which are they ?
+
+*** Gaussian distribution
+What is the number of parameters to estimate for a Gaussian distribution
+
+- <2-> The mean: $d$
+- <3-> The covariance matrix: $d(d+1)/2$
+
+**** Total: $d(d+3)/2 \approx d^2/2$                           :B_onlyenv:
+:PROPERTIES:
+:BEAMER_env: block
+:BEAMER_act: <4->
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[ymode=log,xmin=1,xmax=200,width=0.6\linewidth,height=0.35\linewidth,grid=both,axis x line=left ,axis y line=left, tick align=outside,xlabel = $d$,ylabel = $\eta_c$]
+      \addplot+[very thick,mark=none,smooth,domain=1:200,samples=200] (\x,{\x*(\x+3)/2});
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+* References                                                         :export:
+*** Bibliography
+  :PROPERTIES:
+  :BEAMER_OPT: fragile,allowframebreaks,label=
+  :END:      
+  \printbibliography
+  
+
+
+* Draft                                                            :noexport:
+1. Introduction
+   1. Remote sensing
+   2. Application of hyperspectral remote sensing
+2. Hyperspectral imagery
+   1. Element of physics
+   2. Digital Remote sensing images
+   3. Spectral Signatures
+3. Current challenges
+   1. An interdisciplinary field
+   2. Processing Chain
+   3. Hot topics
+   4. Challenges
+** Column view
+#+BEGIN: columnview :hlines 2 :id global :skip-empty-rows t
+| Task                                | Estimated Effort | CLOCKSUM |
+|-------------------------------------+------------------+----------|
+| Introduction                        |               15 |          |
+|-------------------------------------+------------------+----------|
+| Hyperspectral imagery               |               30 |          |
+|-------------------------------------+------------------+----------|
+| Current challenges in hyperspectral |               30 |          |
+|-------------------------------------+------------------+----------|
+| Questions                           |               15 |          |
+#+END:
