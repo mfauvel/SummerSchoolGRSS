@@ -1,0 +1,132 @@
+#+TITLE: Feature Extraction
+#+SUBTITLE: GRSS Summer School
+#+AUTHOR: Mathieu Fauvel
+#+EMAIL: mathieu.fauvel@ensat.fr
+#+DATE: [2017-04-26 Wed 10:30-12:00]
+
+#+INCLUDE_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+LANGUAGE: en
+#+OPTIONS: H:3 toc:t tags:nil properties:nil
+
+#+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM
+
+#+LaTeX_CLASS_OPTIONS: [10pt,aspectratio=1610]
+
+#+BEAMER_THEME: DarkConsole
+#+BEAMER_HEADER: \institute{UMR Dynafor}
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \setbeamercovered{again covered={\opaqueness<1->{25}}}
+#+BEAMER_HEADER: \usefonttheme[onlymath]{serif}
+
+#+LATEX_HEADER: \usepackage[english]{babel}\usepackage{etex}
+#+LATEX_HEADER: \usepackage{tikz}\usepackage{amsmath}\usepackage[T1]{fontenc}\usepackage{lmodern}%\usepackage{arev}
+#+LATEX_HEADER: \usepackage{booktabs}\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
+#+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
+#+LATEX_HEADER: \addbibresource{fe.bib}
+#+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
+
+* Motivations
+*** Illustration
+- <1-> *Curse of dimensionality*: it is not possible to get enough data to cover all the observation space.
+  #+BEGIN_CENTER
+  /High dimensional saces are mostly empty !/
+  #+END_CENTER
+- <2> Multivariate data live in a lower dimensional space
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[grid=major,small]
+        \addplot3 [mesh, samples=15, domain=-5:5] {x+y+1};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+*** Application
+- Feature extraction is important in remote sensing because:
+  + It reduces the size of the data,
+  + It limits the spatial and spectral redundancy,
+  + It permits visualization of the data,
+  + It mitigates the /curse of dimensionality/.
+- Extraction techniques:
+  + Spectral
+    * Physically based method,
+    * Statistical methods.
+  + Spatial:
+    * Linear filters,
+    * Non linear techniques (Mathematical Morphology)
+
+    
+* Physical Indices
+** Introduction
+*** Spectral indices
+- Spectral indices are a linear/non-linear combination of two (or more) spectral bands.
+- They provides information as a /single number/ about:
+  + Plant structure,
+  + Biochemistry,
+  + Humidity,
+  + Stress.
+- Four main types cite:hrsv:2011:
+  #+ATTR_LATEX: :centering :booktabs t
+  | Name                                   | Formulae                                                                            |
+  |----------------------------------------+-------------------------------------------------------------------------------------|
+  | Difference vegetation index            | $R_{\lambda_1} - R_{\lambda_2}$                                                   |
+  | Ration vegetation index                | $\dfrac{R_{\lambda_1}}{R_{\lambda_2}}$                                            |
+  | Normalized difference vegetation index | $\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} + R_{\lambda_2}}$          |
+  | Soil-adjusted vegetation index         | $(1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} - R_{\lambda_2}+L}$ |
+- /The three last indexes are invariant to  a multiplicative factor/
+
+*** Conventional Indices
+Index database : [[http://www.indexdatabase.de/]]
+
+#+ATTR_LATEX: :centering :booktabs t :font \small
+| Name                                        | Formulae  ($\lambda$ nm)                                                                                                                        |
+|---------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Normalized Difference Vnegetation index     | $\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$                                                          |
+| Modified Soil-Adjusted Vegetation Index     | $\dfrac{1}{2}\left[2R_{\lambda_{800}}+1 - \sqrt{(2R_{\lambda_{800}}+1)^2-8(R_{\lambda_{800}}-R_{\lambda_{670}})}\right]$                        |
+| Modified Chlorophyll Absorption Ratio Index | $\left[(R_{\lambda_{700}}-R_{\lambda_{670}})-0.2(R_{\lambda_{700}}-R_{\lambda_{550}})\right]\times\dfrac{R_{\lambda_{700}}}{R_{\lambda_{670}}}$ |
+|---------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Normalized Difference Water Index           | $\dfrac{R_{\lambda_{858}} - R_{\lambda_{1240}}}{R_{\lambda_{858}} + R_{\lambda_{1240}}}$                                                        |
+| Datt Reflectance Index                      | $\dfrac{R_{\lambda_{816}} - R_{\lambda_{2218}}}{R_{\lambda_{816}} + R_{\lambda_{2218}}}$                                                        |
+|---------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Normalized Difference Redness Index         | $\dfrac{R_{\lambda_{540}} - R_{\lambda_{700}}}{R_{\lambda_{540}} + R_{\lambda_{700}}}$                                                          |
+| Soil Brightness Index                       | $0.406R_{\lambda{550}}+0.600R_{\lambda{650}}+0.645R_{\lambda{750}}+0.243R_{\lambda{950}}$                                                       |
+
+** Vegetation Indices
+*** Normalized difference vegetation index
+#+BEGIN_EXPORT latex
+$$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$$
+#+END_EXPORT
+- $-1\leq \text{NVDI} \leq 1$
+- $\text{NDVI}< 0$: surfaces other thatn plant cover
+- $\text{NDVI}\approx 0$: bare soil
+- $\text{NDVI}\geq 0.1$: vegetation cover (higher values correspond to more dense covers)
+
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[xmin=0.4,xmax=1,ymin=0,ymax=1,grid,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance,width=0.6\linewidth,height=0.3\linewidth,cycle list name=color list]
+  \addplot+[mark=none,thick,smooth] file {../Introduction/figures/oak.txt};
+  \pgfplotstableread{../Introduction/figures/grass.txt}\loadedtable
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=grass] from \loadedtable;
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=drygrass] from \loadedtable;
+  \pgfplotstableread{../Introduction/figures/talc.txt}\loadtable
+  \addplot+[mark=none,smooth,thick] table[x=wave,y=talc] from \loadtable;
+  \legend{0.81,0.90, 0.05, -0.03}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+#+END_EXPORTH
+** Case study
+* Statistical Feature Extraction
+
+** Unsupervised
+
+** Supervised
+
+* Spatial feature extaction
+
+** Linear filters
+
+** Mathematical morphology
