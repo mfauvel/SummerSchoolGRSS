@@ -1,4 +1,4 @@
-% Created 2017-02-22 Wed 16:47
+% Created 2017-03-02 Thu 16:19
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,aspectratio=1610]{beamer}
 \usepackage[utf8]{inputenc}
@@ -14,7 +14,7 @@
 \usepackage{amssymb}
 \usepackage{capt-of}
 \usepackage{hyperref}
-\usepackage[english]{babel}\usepackage{etex}
+\usepackage[english]{babel}\usepackage{etex}\usepackage{minted}\usemintedstyle{emacs}
 \usepackage{tikz}\usepackage{amsmath}\usepackage[T1]{fontenc}\usepackage{lmodern}%\usepackage{arev}
 \usepackage{booktabs}\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
 \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
@@ -39,8 +39,8 @@
 
 
 \section{Motivations}
-\label{sec:org5511588}
-\begin{frame}[label={sec:org607cc80}]{Illustration}
+\label{sec:org34ae4b3}
+\begin{frame}[label={sec:org4136f0b}]{Illustration}
 \begin{itemize}
 \item <1-> \alert{Curse of dimensionality}: it is not possible to get enough data to cover all the observation space.
 \begin{center}
@@ -56,7 +56,7 @@
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org19f761f}]{Application}
+\begin{frame}[label={sec:org5670ac8}]{Application}
 \begin{itemize}
 \item Feature extraction is important in remote sensing because:
 \begin{itemize}
@@ -83,10 +83,10 @@
 
 
 \section{Physical Indices}
-\label{sec:org38aefb3}
+\label{sec:org76a5b97}
 \subsection{Introduction}
-\label{sec:orga617182}
-\begin{frame}[label={sec:org0709c32}]{Spectral indices}
+\label{sec:org479da86}
+\begin{frame}[label={sec:org4eb7e31}]{Spectral indices}
 \begin{itemize}
 \item Spectral indices are a linear/non-linear combination of two (or more) spectral bands.
 \item They provides information as a \emph{single number} about:
@@ -103,7 +103,7 @@
 Name & Formulae\\
 \midrule
 Difference vegetation index & \(R_{\lambda_1} - R_{\lambda_2}\)\\
-Ration vegetation index & \(\dfrac{R_{\lambda_1}}{R_{\lambda_2}}\)\\
+Ratio vegetation index & \(\dfrac{R_{\lambda_1}}{R_{\lambda_2}}\)\\
 Normalized difference vegetation index & \(\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} + R_{\lambda_2}}\)\\
 Soil-adjusted vegetation index & \((1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} - R_{\lambda_2}+L}\)\\
 \bottomrule
@@ -113,7 +113,7 @@ Soil-adjusted vegetation index & \((1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org6369441}]{Conventional Indices}
+\begin{frame}[label={sec:org7bb2ab1}]{Conventional Indices}
 Index database : \url{http://www.indexdatabase.de/}
 
 \begin{center}
@@ -137,12 +137,12 @@ Soil Brightness Index & \(0.406R_{\lambda{550}}+0.600R_{\lambda{650}}+0.645R_{\l
 \end{frame}
 
 \subsection{Vegetation Indices}
-\label{sec:orgef9baf6}
-\begin{frame}[label={sec:orga5f0f7c}]{Normalized difference vegetation index}
+\label{sec:org76971da}
+\begin{frame}[label={sec:orgeb5e234}]{Normalized difference vegetation index}
 $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$$
 \begin{itemize}
 \item \(-1\leq \text{NVDI} \leq 1\)
-\item \(\text{NDVI}\leq 0\): surfaces other thatn plant cover
+\item \(\text{NDVI}< 0\): surfaces other thatn plant cover
 \item \(\text{NDVI}\approx 0\): bare soil
 \item \(\text{NDVI}\geq 0.1\): vegetation cover (higher values correspond to more dense covers)
 \end{itemize}
@@ -161,26 +161,143 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{tikzpicture}
 \end{center}
 \end{frame}
-
-\begin{frame}[label={sec:orge334623}]{}
+\begin{frame}[label={sec:orgc77bd24}]{Modified Soil-Adjusted Vegetation Index}
 \end{frame}
 \subsection{Case study}
-\label{sec:orge0f6c42}
+\label{sec:orgefa969b}
+\begin{frame}[label={sec:orgbdb3794}]{University of Pavia}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.6\linewidth]{./figures/university_color.png}
+\end{center}
+\end{column}
+
+\begin{column}{0.5\columnwidth}
+\begin{itemize}
+\item Peri-urban area
+\item Rosis-3 sensor
+\item 103 Spectral bands (400nm-900nm)
+\item 1.5 meter per pixel spatial resolution
+\item 610 \(\times\) 340 pixels
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:orge44d26d}]{Orfeo-Toolbox}
+ \begin{itemize}
+\item \href{https://www.orfeo-toolbox.org/}{OTB} is a C++ library for remote sensing images processing.
+\item It is free, open-source and available for most OS (window, apple, linux)
+\item \href{https://www.orfeo-toolbox.org/CookBook/OTB-Applications.html}{OTB-Applications} are set of tools appropriated for big/large images
+\item They are avalaible from QGIS, Python and Bash
+\item To compute the NDVI
+\end{itemize}
+
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{bash}
+# Computation of the NDVI
+otbcli_BandMath -il ../Data/university.tif -out ../Data/university_ndvi.tif \
+		-exp "(im1b83-im1b56)/(im1b83+im1b56)"
+
+# Computation of the SBI
+otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
+		-exp "0.406*im1b31 + 0.6*im1b52 + 0.645*im1b73"
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:org69da580}]{University of Pavia - Spectral Indices}
+\begin{columns}
+\begin{column}{0.3\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{./figures/university_color.png}
+\end{center}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{./figures/university_ndvi.png}
+\end{center}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{./figures/university_sbi.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile,label={sec:org785e1bf}]{Where is the vegetation 1/2 ?}
+   \begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Histogram of the NDVI,xmin=-0.6,xmax=1]
+      \addplot+[mark=none,thick,smooth] table[x=x,y=y,col sep=comma] {figures/pdf.csv};
+      \only<2->{\addplot[red,thick] coordinates {(0.19,0) (0.19,0.008)};
+      \addplot[red,thick] coordinates {(0.62,0) (0.62,0.008)}; }     
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{bash}
+# Segmentation of the NDVI in three classes
+otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_segmented.tif \
+		-exp "(im1b1<0.19?1:(im1b1<0.62?2:3))"
+\end{minted}
+\end{frame}
+
+\begin{frame}[label={sec:org986c9db}]{Where is the vegetation 2/2 ?}
+\begin{columns}
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.6\linewidth]{./figures/university_color.png}
+\end{center}
+\end{column}
+
+\begin{column}{0.5\columnwidth}
+\begin{center}
+\includegraphics[width=0.6\linewidth]{./figures/university_ndvi_segmented.png}
+\end{center}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{Question}
+\label{sec:org03e7bd6}
+\begin{frame}[label={sec:orgf23d211}]{Could you find the good one ?}
+ \centerline{\begin{tabular}{cc}
+    \includegraphics[width=0.4\linewidth]{figures/image1.jpg} & \begin{tikzpicture}\pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
+      \begin{axis}[ytick=\empty,xmin=-0.5,xmax=0.9,ymin=0,width=0.5\linewidth,axis y line=center,axis x line=bottom,legend columns=4]
+        \pgfplotstableread{figures/ndvi1.txt}\loadedtable
+        \addplot[smooth,very thick,dashed,blue] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi2.txt}\loadedtable
+        \addplot[smooth,very thick,magenta] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi3.txt}\loadedtable
+        \addplot[smooth,very thick,dotted,orange] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi4.txt}\loadedtable
+        \addplot[smooth,very thick,dashdotted,green] table[x=wave,y=ndvi] from \loadedtable;
+        \legend{ndvi$_1$,ndvi$_2$,ndvi$_3$,ndvi$_4$};
+      \end{axis}
+    \end{tikzpicture}\\
+    Image & NDVI Histogram
+\end{tabular}}
+
+From the histogram, which one does correspond to the NDVI of the image ?
+\end{frame}
 \section{Statistical Feature Extraction}
-\label{sec:org8004899}
+\label{sec:orgfc9c661}
 
 \subsection{Unsupervised}
-\label{sec:org5c9c318}
+\label{sec:org6db8f84}
 
 \subsection{Supervised}
-\label{sec:org6ed1534}
+\label{sec:org812a1cd}
 
 \section{Spatial feature extaction}
-\label{sec:org5010dc7}
+\label{sec:orgbbd3772}
 
 \subsection{Linear filters}
-\label{sec:org3a79d19}
+\label{sec:orgc47f32e}
 
 \subsection{Mathematical morphology}
-\label{sec:org0cb2693}
+\label{sec:org5af4d09}
 \end{document}

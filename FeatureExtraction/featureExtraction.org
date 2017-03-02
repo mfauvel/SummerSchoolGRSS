@@ -20,7 +20,7 @@
 #+BEAMER_HEADER: \setbeamercovered{again covered={\opaqueness<1->{25}}}
 #+BEAMER_HEADER: \usefonttheme[onlymath]{serif}
 
-#+LATEX_HEADER: \usepackage[english]{babel}\usepackage{etex}
+#+LATEX_HEADER: \usepackage[english]{babel}\usepackage{etex}\usepackage{minted}\usemintedstyle{emacs}
 #+LATEX_HEADER: \usepackage{tikz}\usepackage{amsmath}\usepackage[T1]{fontenc}\usepackage{lmodern}%\usepackage{arev}
 #+LATEX_HEADER: \usepackage{booktabs}\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
 #+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
@@ -72,7 +72,7 @@
   | Name                                   | Formulae                                                                            |
   |----------------------------------------+-------------------------------------------------------------------------------------|
   | Difference vegetation index            | $R_{\lambda_1} - R_{\lambda_2}$                                                   |
-  | Ration vegetation index                | $\dfrac{R_{\lambda_1}}{R_{\lambda_2}}$                                            |
+  | Ratio vegetation index                 | $\dfrac{R_{\lambda_1}}{R_{\lambda_2}}$                                            |
   | Normalized difference vegetation index | $\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} + R_{\lambda_2}}$          |
   | Soil-adjusted vegetation index         | $(1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_2}}{R_{\lambda_1} - R_{\lambda_2}+L}$ |
 - /The three last indexes are invariant to  a multiplicative factor/
@@ -117,8 +117,123 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{axis}
 \end{tikzpicture}
 \end{center}
-#+END_EXPORTH
+#+END_EXPORT
+*** Modified Soil-Adjusted Vegetation Index
 ** Case study
+*** University of Pavia
+**** Images                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\linewidth
+[[file:./figures/university_color.png]]
+
+**** Parameters                                                    :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Peri-urban area
+- Rosis-3 sensor
+- 103 Spectral bands (400nm-900nm)
+- 1.5 meter per pixel spatial resolution
+- 610 $\times$ 340 pixels
+
+*** Orfeo-Toolbox
+- [[https://www.orfeo-toolbox.org/][OTB]] is a C++ library for remote sensing images processing.
+- It is free, open-source and available for most OS (window, apple, linux)
+- [[https://www.orfeo-toolbox.org/CookBook/OTB-Applications.html][OTB-Applications]] are set of tools appropriated for big/large images
+- They are avalaible from QGIS, Python and Bash
+- To compute the NDVI
+
+#+BEGIN_SRC bash :tangle ../Codes/spectral_indices.sh
+# Computation of the NDVI
+otbcli_BandMath -il ../Data/university.tif -out ../Data/university_ndvi.tif \
+		-exp "(im1b83-im1b56)/(im1b83+im1b56)"
+
+# Computation of the SBI
+otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
+		-exp "0.406*im1b31 + 0.6*im1b52 + 0.645*im1b73"
+#+END_SRC
+
+*** University of Pavia - Spectral Indices
+**** Images                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width \linewidth
+[[file:./figures/university_color.png]]
+
+**** NDVI                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width \linewidth
+[[file:./figures/university_ndvi.png]]
+
+**** SBI                                                           :BMCOL: 
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width \linewidth
+[[file:./figures/university_sbi.png]]
+
+*** Where is the vegetation 1/2 ?
+
+  #+BEGIN_EXPORT latex
+    \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Histogram of the NDVI,xmin=-0.6,xmax=1]
+        \addplot+[mark=none,thick,smooth] table[x=x,y=y,col sep=comma] {figures/pdf.csv};
+        \only<2->{\addplot[red,thick] coordinates {(0.19,0) (0.19,0.008)};
+        \addplot[red,thick] coordinates {(0.62,0) (0.62,0.008)}; }     
+      \end{axis}
+  \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+
+#+BEGIN_SRC bash :tangle ../Codes/spectral_indices.sh
+# Segmentation of the NDVI in three classes
+otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_segmented.tif \
+		-exp "(im1b1<0.19?1:(im1b1<0.62?2:3))"
+#+END_SRC
+
+*** Where is the vegetation 2/2 ?
+**** Images                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\linewidth
+[[file:./figures/university_color.png]]
+
+**** NDVI                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\linewidth
+[[file:./figures/university_ndvi_segmented.png]]
+
+** Question
+*** Could you find the good one ?
+#+BEGIN_EXPORT latex
+ \centerline{\begin{tabular}{cc}
+    \includegraphics[width=0.4\linewidth]{figures/image1.jpg} & \begin{tikzpicture}\pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
+      \begin{axis}[ytick=\empty,xmin=-0.5,xmax=0.9,ymin=0,width=0.5\linewidth,axis y line=center,axis x line=bottom,legend columns=4]
+        \pgfplotstableread{figures/ndvi1.txt}\loadedtable
+        \addplot[smooth,very thick,dashed,blue] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi2.txt}\loadedtable
+        \addplot[smooth,very thick,magenta] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi3.txt}\loadedtable
+        \addplot[smooth,very thick,dotted,orange] table[x=wave,y=ndvi] from \loadedtable;
+        \pgfplotstableread{figures/ndvi4.txt}\loadedtable
+        \addplot[smooth,very thick,dashdotted,green] table[x=wave,y=ndvi] from \loadedtable;
+        \legend{ndvi$_1$,ndvi$_2$,ndvi$_3$,ndvi$_4$};
+      \end{axis}
+    \end{tikzpicture}\\
+    Image & NDVI Histogram
+\end{tabular}}
+#+END_EXPORT
+
+From the histogram, which one does correspond to the NDVI of the image ?
 * Statistical Feature Extraction
 
 ** Unsupervised
