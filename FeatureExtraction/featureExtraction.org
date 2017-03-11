@@ -26,8 +26,8 @@
 #+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
 #+LATEX_HEADER: \addbibresource{fe.bib}
 #+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
-
-* Motivations
+#+LATEX_HEADER: \pgfplotsset{compat=newest}
+* Motivations                                                        :export:
 *** Illustration
 - <1-> *Curse of dimensionality*: it is not possible to get enough data to cover all the observation space.
   #+BEGIN_CENTER
@@ -58,7 +58,7 @@
     * Non linear techniques (Mathematical Morphology)
 
     
-* Physical Indices
+* Physical Indices                                                   :export:
 ** Introduction
 *** Spectral indices
 - Spectral indices are a linear/non-linear combination of two (or more) spectral bands.
@@ -118,7 +118,6 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{tikzpicture}
 \end{center}
 #+END_EXPORT
-*** Modified Soil-Adjusted Vegetation Index
 ** Case study
 *** University of Pavia
 **** Images                                                        :BMCOL:
@@ -182,7 +181,7 @@ otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
   #+BEGIN_EXPORT latex
     \begin{center}
     \begin{tikzpicture}
-      \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Histogram of the NDVI,xmin=-0.6,xmax=1]
+      \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Density plot of the NDVI,xmin=-0.6,xmax=1,ymin=0,ymax=0.01]
         \addplot+[mark=none,thick,smooth] table[x=x,y=y,col sep=comma] {figures/pdf.csv};
         \only<2->{\addplot[red,thick] coordinates {(0.19,0) (0.19,0.008)};
         \addplot[red,thick] coordinates {(0.62,0) (0.62,0.008)}; }     
@@ -232,11 +231,405 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
     Image & NDVI Histogram
 \end{tabular}}
 #+END_EXPORT
+#+LaTeX: \vspace{1cm}
 
 From the histogram, which one does correspond to the NDVI of the image ?
-* Statistical Feature Extraction
-
+* Statistical Feature Extraction                                     :export:
 ** Unsupervised
+*** Principal Components Analysis
+- Linear transformation used to reduce the dimensionality of the data cite:jolliffe2002principal.
+  $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
+- Find features $\mathbf{z}$ that  account for most of the variability of the data:
+  + $z_1,~z_2,~z_3,\ldots$ are mutually uncorrelated,
+  + $\text{var}(z_i)$ is as large as possible,
+  + $\text{var}(z_1)>\text{var}(z_2)>\text{var}(z_3)>\ldots$
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid,small,width=0.4\linewidth,height=0.32\linewidth,xmin=0,xmax=2.5,ymin=0,ymax=2]
+      \addplot[only marks,blue] table[x index=0,y index = 1,col sep =comma] {figures/pca_data.csv};
+      \begin{scope}
+      \addplot[very thick,red] coordinates { (0.080264,0.83834891)  (2.06023219,1.12070676)};
+      \addplot[very thick,red] coordinates { (0.92906917,  1.96951193)(1.21142702, -0.01045626)};
+    \end{scope}
+
+   \end{axis}                                  
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Maximization of the variance 1/2
+- <1-> Search $\mathbf{v}_1$ such as $\max\text{var}(z_1)$:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \text{var}(z_1) & = & \text{var}(\langle\mathbf{v}_1,\mathbf{x}\rangle)\\
+    &=& \mathbf{v}_1^\top\boldsymbol{\Sigma}\mathbf{v}_1
+  \end{eqnarray*}
+  #+END_EXPORT
+- <2-> Indetermined: if $\hat{\mathbf{v}}_1$ maximizes the variance, $\alpha\hat{\mathbf{v}}_1$ too!  Add a constraint: $\langle\mathbf{v}_1,\mathbf{v}_1\rangle=1$
+- <3-> Lagrangian:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \mathcal{L}(\mathbf{v}_1,\lambda_1) = \mathbf{v}_1^\top\boldsymbol{\Sigma}\mathbf{v}_1 + \lambda_1(1- \mathbf{v}_1^\top\mathbf{v}_1)  
+  \end{eqnarray*}
+  #+END_EXPORT
+- <4-> Compute the derivative w.r.t $\mathbf{v}_1$:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+  \frac{\partial\mathcal{L}}{\partial\mathbf{v}_1} = 2\boldsymbol{\Sigma}\mathbf{v}_1-2\lambda_1\mathbf{v}_1
+  \end{eqnarray*}
+  #+END_EXPORT
+- <5-> $\mathbf{v}_1$ is an eigenvector of the covariance matrix of $\mathbf{x}$:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \boldsymbol{\Sigma}\mathbf{v}_1 =\lambda_1\mathbf{v}_1
+  \end{eqnarray*}
+  #+END_EXPORT
+- <6->  $\mathbf{v}_1$ is the eigenvector corresponding to the largest eigenvalues !
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \text{var}(z_1)  =  \mathbf{v}_1^\top\boldsymbol{\Sigma}\mathbf{v}_1 = \lambda_1 \mathbf{v}_1^\top\mathbf{v}_1 = \lambda_1
+  \end{eqnarray*}
+  #+END_EXPORT
+*** Maximization of the variance 2/2
+- <1-> Search $\mathbf{v}_2$ such as $\max\text{var}(z_2)$ and $\langle\mathbf{v}_2,\mathbf{v}_2\rangle=1$ and $\langle\mathbf{v}_1,\mathbf{v}_2\rangle=0$
+- <2-> Lagrangian:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \mathcal{L}(\mathbf{v}_2,\lambda_2,\beta_1) = \mathbf{v}_2^\top\boldsymbol{\Sigma}\mathbf{v}_2 + \lambda_1(1- \mathbf{v}_2^\top\mathbf{v}_2) + \beta_1(0 - \mathbf{v}_2^\top\mathbf{v}_1)
+  \end{eqnarray*}
+  #+END_EXPORT
+- <3-> Compute the derivative w.r.t $\mathbf{v}_2$:
+   #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+  \frac{\partial\mathcal{L}}{\partial\mathbf{v}_2} &=& 2\boldsymbol{\Sigma}\mathbf{v}_2-2\lambda_1\mathbf{v}_2-\beta_1\mathbf{v}_1\\
+  \boldsymbol{\Sigma}\mathbf{v}_2 &=& \lambda_1\mathbf{v}_2+2\beta_1\mathbf{v}_1
+  \end{eqnarray*}
+  #+END_EXPORT
+- <4-> At optimality, $\langle\mathbf{v}_1,\mathbf{v}_2\rangle=0$. Left-multiplying by $\mathbf{v}_1^\top$ the above equation:
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \mathbf{v}_1^\top\boldsymbol{\Sigma}\mathbf{v}_2 &=& 2\beta_1 \\
+    \lambda_1\mathbf{v}_1^\top\mathbf{v}_2 &=& 2\beta_1 \\
+    0 &=& 2\beta_1 \\
+  \end{eqnarray*}
+  #+END_EXPORT
+- <5-> Hence, we have 
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \boldsymbol{\Sigma}\mathbf{v}_2 =\lambda_2\mathbf{v}_2
+  \end{eqnarray*}
+  #+END_EXPORT
+- <6-> $\mathbf{v}_2$ is the eigenvector corresponding the /second largest/ eigenvalues
+- <7-> $\mathbf{v}_k$ is the eigenvector corresponding the /$k^{\text{th}}$ largest/ eigenvalues
+*** PCA in practice
+1) Empirical estimation the mean value:
+   #+BEGIN_EXPORT latex
+   \begin{eqnarray*}
+     \boldsymbol{\mu} = \frac{1}{n}\sum_{i=1}^n\mathbf{x}_i
+   \end{eqnarray*}
+   #+END_EXPORT
+2) Empirical estimation the covariance matrix:
+   #+BEGIN_EXPORT latex
+   \begin{eqnarray*}
+     \boldsymbol{\Sigma} = \frac{1}{n-1}\sum_{i=1}^n(\mathbf{x}_i-\boldsymbol{\mu})(\mathbf{x}_i-\boldsymbol{\mu})^\top
+   \end{eqnarray*}
+   #+END_EXPORT
+3) Compute $p$ first eigenvalues/eigenvectors... How to choose $p$ ? Explained variance: 
+   #+BEGIN_EXPORT latex
+   $$\frac{\sum_{i=1}^p\lambda_i}{\sum_{i=1}^d\lambda_i}$$
+   #+END_EXPORT
+4) Tips for high dimensional data set: if $n<d$ see cite:manolakis2016hyperspectral page 420
+*** PCA case study 1/3
+#+BEGIN_SRC python :tangle ../Codes/pcaPavia.py
+import rasterTools as rt
+import scipy as sp
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# Load data set
+im,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=im.shape
+im.shape=(h*w,b)
+wave = sp.loadtxt('../Data/waves.csv',delimiter=',')
+
+# Do PCA
+pca = PCA()
+pca.fit(im)
+
+# Plot explained variance
+l = pca.explained_variance_ratio_
+print l[:5]
+print (l.cumsum()/l.sum())[:5]
+
+# Save Eigenvectors
+D = sp.concatenate((wave[:,sp.newaxis],pca.components_[:3,:].T),axis=1)
+sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
+#+END_SRC
+*** PCA case study 2/3
+- Explained variance
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,ylabel=\% of variance,xlabel=Number of principal components,axis y line*=left,yticklabel style=red,ylabel style=red, y axis line style=red,ytick style=red]
+        \addplot[thick,mark=*,red] coordinates { (1,0.58318064)  (2,0.94418758)  (3,0.98856319)  (4,0.99157161)  (5,0.99366953)};
+      \end{axis}
+      \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,axis y line*=right,axis x line=none,ylabel=Variance,yticklabel style=blue,ylabel style=blue, y axis line style=blue,ytick style=blue]
+        \addplot[thick,mark=*,blue] coordinates { (1,0.58318064)  (2,0.36100695)  (3,0.04437561)  (4,0.00300841)  (5,0.00209792)};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+- Principal components
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[width=0.9\textwidth,height=0.3\textwidth,grid,xmin=400,xmax=900,cycle list name=color list]
+        \addplot+[thick] table[col sep=comma,x index=0,y index=1] {figures/pca_pcs.csv};
+        \addplot+[thick] table[col sep=comma,x index=0,y index=2] {figures/pca_pcs.csv};
+        \addplot+[thick] table[col sep=comma,x index=0,y index=3] {figures/pca_pcs.csv};
+        \legend{pc1,pc2,pc3};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+*** PCA case study 3/3
+#+BEGIN_SRC python :tangle ../Codes/pcaPavia.py
+# Projection of the first PCs
+imp = sp.dot(im,pca.components_[:3,:].T)
+imp.shape = (h,w,3)
+
+# Save image
+rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
+#+END_SRC
+**** PCA 1                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_pc1.png]]
+
+**** PCA 2                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_pc2.png]]
+
+**** PCA 3                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_pc3.png]]
+
+*** Kernel PCA
+- PCA is limited to second order information
+- To capture higher-order statistics, it is possible to map the data onto another space $\mathcal{H}$
+  #+BEGIN_EXPORT latex
+    \begin{eqnarray*}
+      \begin{array}{rcl}
+        \phi:\mathbb{R}^d &\to&\mathcal{H}\\
+        \mathbf{x}&\mapsto&\phi(\mathbf{x}).
+      \end{array}
+    \end{eqnarray*}
+  #+END_EXPORT
+- In $\mathcal{H}$, conventional PCA can be applied.
+- Using the /kernel trick/ it is possible to directly work on the /kernel matrix/ in $\mathbb{R}^d$
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}\label{kpca:matrix}
+   \mathbf{K}=\left(
+   \begin{array}{cccc}
+   k(\mathbf{x}_1,\mathbf{x}_1) & k(\mathbf{x}_1,\mathbf{x}_2) & \ldots & k(\mathbf{x}_1,\mathbf{x}_n)\\
+   k(\mathbf{x}_2,\mathbf{x}_1) & k(\mathbf{x}_2,\mathbf{x}_2) & \ldots & k(\mathbf{x}_2,\mathbf{x}_n)\\ 
+   \vdots & \vdots & \ddots & \vdots \\
+   k(\mathbf{x}_n,\mathbf{x}_1) & k(\mathbf{x}_n,\mathbf{x}_2) & \ldots & k(\mathbf{x}_n,\mathbf{x}_n)\\
+   \end{array}\right).
+  \end{eqnarray*}
+  #+END_EXPORT
+- <2> KPCA versus PCA:
+
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tabular}{ccc}
+    \begin{tikzpicture}
+      \begin{axis}[width=0.3\textwidth,height=0.3\textwidth,grid]
+        \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/kpca_data.csv};
+      \end{axis}
+    \end{tikzpicture}&
+    \begin{tikzpicture}
+      \begin{axis}[width=0.3\textwidth,height=0.3\textwidth,grid]
+        \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/kpca_datap.csv};
+      \end{axis}
+    \end{tikzpicture}&
+                       \begin{tikzpicture}
+        \begin{axis}[width=0.3\textwidth,height=0.3\textwidth,ylabel=\% of variance,axis y line*=left,yticklabel style=red,ylabel style=red, y axis line style=red,ytick style=red]
+          \addplot[thick,mark=*,red] coordinates { (1,0.171950045779)
+            (2,0.293633371022)
+            (3,0.41194893578)
+            (4,0.481444806977)
+            (5,0.54956124474)
+            (6,0.612183510855)
+            (7,0.673659036749)
+            (8,0.721296411495)
+            (9,0.767653893262)
+            (10,0.80191080235)};
+        \end{axis}
+        \begin{axis}[width=0.3\textwidth,height=0.3\textwidth,axis y line*=right,axis x line=none,ylabel=Variance,yticklabel style=blue,ylabel style=blue, y axis line style=blue,ytick style=blue]
+          \addplot[thick,mark=*,blue] coordinates {(1,57.4446834929)
+            (2,40.6516908637)
+            (3,39.5265970358)
+            (4,23.2170239146)
+            (5,22.7561859043)
+            (6,20.9207054308)
+            (7,20.5376050443)
+            (8,15.914586718)
+            (9,15.4870029584)
+            (10,11.4444709279) };
+        \end{axis}
+      \end{tikzpicture}         
+    \end{tabular}
+
+  \end{center}
+  #+END_EXPORT
+
+*** Kernel PCA in practice
+- Choose the kernel and its parameters
+- Compute the kernel matrix $\mathbf{K}$ for all the pixels (or a subset)
+- Center the matrix
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+   \mathbf{K}_c=\mathbf{K}-\mathbf{1}_n\mathbf{K}-\mathbf{K}\mathbf{1}_n+\mathbf{1}_n\mathbf{K}\mathbf{1}_n
+  \end{eqnarray*}
+  #+END_EXPORT
+- Solve the eigenproblems
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \lambda\boldsymbol{\alpha}=\mathbf{K}\boldsymbol{\alpha} \text{ subject to } \|\boldsymbol{\alpha}\|_2 = \frac{1}{\lambda}
+  \end{eqnarray*}
+  #+END_EXPORT
+- Project on the $p$ first /kernel principal components/: $\phi^{kpc}(\mathbf{x})=\begin{bmatrix}\phi^{kpc}_1(\mathbf{x})&\hdots&\phi^{kpc}_p(\mathbf{x})\end{bmatrix}^t$
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \phi^{kpc}_j(\mathbf{x})=\sum_{i=1}^n \alpha_{ki} k(\mathbf{x}_i,\mathbf{x})
+  \end{eqnarray*}
+  #+END_EXPORT
+
+*** KPCA case study 1/3
+
+From cite:fauvel2009kernel.
+
+#+BEGIN_SRC python :tangle ../Codes/kpcaPavia.py
+import rasterTools as rt
+import scipy as sp
+from sklearn.decomposition import KernelPCA
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+
+# Load data set
+im,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=im.shape
+im.shape=(h*w,b)
+wave = sp.loadtxt('../Data/waves.csv',delimiter=',')
+
+# Scale data
+sc = StandardScaler()
+im = sc.fit_transform(im)
+
+# Do KPCA
+kpca = KernelPCA(kernel='rbf',gamma=1.0/b,n_jobs=-1)
+kpca.fit(im[::50,:]) # Use a subset of the total number of pixels
+
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/kpcaPavia.py :exports none
+# Plot explained variance
+l = kpca.lambdas_
+cl = l.cumsum()/l.sum()
+for i in range(10):
+    print "({0},{1})".format(i+1,l[i])
+
+for i in range(10):
+    print "({0},{1})".format(i+1,cl[i])
+
+# Save Eigenvectors
+idx = sp.arange(kpca.alphas_[0,:].size)+1
+D = sp.concatenate((idx[:,sp.newaxis],kpca.alphas_[:3,:].T),axis=1)
+sp.savetxt('../FeatureExtraction/figures/kpca_pcs.csv',D,delimiter=',')
+#+END_SRC
+
+*** KPCA case study 2/3
+- Explained variance
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,ylabel=\% of variance,xlabel=Number of principal components,axis y line*=left,yticklabel style=red,ylabel style=red, y axis line style=red,ytick style=red]
+        \addplot[thick,mark=*,red] coordinates {(1,0.257631571125)
+        (2,0.438129567049)
+        (3,0.61420975716)
+        (4,0.695091757082)
+        (5,0.751533118467)
+        (6,0.790148033382)
+        (7,0.814644462352)
+        (8,0.833924207631)
+        (9,0.851128186791)
+        (10,0.865878267501) };
+      \end{axis}
+      \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,axis y line*=right,axis x line=none,ylabel=Variance,yticklabel style=blue,ylabel style=blue, y axis line style=blue,ytick style=blue]
+        \addplot[thick,mark=*,blue] coordinates {(1,649.766197024)
+        (2,455.229519695)
+        (3,444.087481204)
+        (4,203.990486367)
+        (5,142.349357966)
+        (6,97.389719371)
+        (7,61.7818360658)
+        (8,48.6249674864)
+        (9,43.3897292304)
+        (10,37.2008127987) };
+        \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+- Principal components
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[width=0.9\textwidth,height=0.3\textwidth,grid,cycle list name=color list,xmin=0,xmax=4148]
+        \addplot+[thick] table[col sep=comma,x index=0,y index=1] {figures/kpca_pcs.csv};
+        \addplot+[thick] table[col sep=comma,x index=0,y index=2] {figures/kpca_pcs.csv};
+        \addplot+[thick] table[col sep=comma,x index=0,y index=3] {figures/kpca_pcs.csv};
+        \legend{kpc1,kpc2,kpc3};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+*** KPCA case study 3/3
+#+BEGIN_SRC python :tangle ../Codes/kpcaPavia.py
+imp = kpca.transform(im)[:,:3]
+imp.shape = (h,w,3)
+
+# Save image
+rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
+#+END_SRC
+**** PCA 1                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_kpc1.png]]
+
+**** PCA 2                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_kpc2.png]]
+
+**** PCA 3 :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.75\linewidth :center
+[[file:./figures/university_kpc3.png]]
 
 ** Supervised
 
@@ -245,3 +638,97 @@ From the histogram, which one does correspond to the NDVI of the image ?
 ** Linear filters
 
 ** Mathematical morphology
+* Figures                                                          :noexport:
+** PCA
+#+BEGIN_SRC python :session :results output
+# Load data
+from sklearn.datasets.samples_generator import make_classification
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import scipy as sp
+
+
+# Generate samples
+X, y = make_classification(n_samples=100, n_classes=1, n_features=2, n_informative=2,n_redundant=0,random_state=1,n_clusters_per_class=1)
+
+# Do PCA
+pca = PCA(n_components=2)
+pca.fit(X)
+
+print(pca.explained_variance_ratio_)
+print(pca.components_)
+
+# Compute the eigenvector
+for i in range(2):
+      print(X.mean(axis=0)-pca.components_[i])
+      print(X.mean(axis=0)+pca.components_[i])
+      
+
+# Save data
+sp.savetxt("figures/pca_data.csv",X,delimiter=',')
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+>>> >>> >>> >>> >>> >>> ... >>> >>> ... >>> PCA(copy=True, iterated_power='auto', n_components=2, random_state=None,
+  svd_solver='auto', tol=0.0, whiten=False)
+>>> [ 0.84182344  0.15817656]
+[[ 0.9899841   0.14117892]
+ [ 0.14117892 -0.9899841 ]]
+>>> ... ... ... ... ... [ 0.080264    0.83834891]
+[ 2.06023219  1.12070676]
+[ 0.92906917  1.96951193]
+[ 1.21142702 -0.01045626]
+#+end_example
+** KPCA
+#+BEGIN_SRC python :session :results output
+from sklearn.datasets import make_circles
+from sklearn.decomposition import KernelPCA
+import scipy as sp
+
+# Data generation
+X, y = make_circles(n_samples=400, factor=.3, noise=.05)
+# Do KPCA
+kpca = KernelPCA(kernel="rbf",gamma=5)
+Xp = kpca.fit_transform(X)
+
+# Get eigenvalues
+l = kpca.lambdas_
+cl = l.cumsum()/l.sum()
+
+for i in range(10):
+    print "({0},{1})".format(i+1,l[i])
+
+for i in range(10):
+    print "({0},{1})".format(i+1,cl[i])
+
+# Save results
+sp.savetxt("figures/kpca_data.csv",sp.concatenate((X,y[:,sp.newaxis]),axis=1),delimiter=',')
+sp.savetxt("figures/kpca_datap.csv",sp.concatenate((Xp[:,:2],y[:,sp.newaxis]),axis=1),delimiter=',')
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+>>> >>> >>> ... >>> ... >>> >>> >>> ... >>> >>> >>> ... ... (1,57.4446834929)
+(2,40.6516908637)
+(3,39.5265970358)
+(4,23.2170239146)
+(5,22.7561859043)
+(6,20.9207054308)
+(7,20.5376050443)
+(8,15.914586718)
+(9,15.4870029584)
+(10,11.4444709279)
+... ... (1,0.171950045779)
+(2,0.293633371022)
+(3,0.41194893578)
+(4,0.481444806977)
+(5,0.54956124474)
+(6,0.612183510855)
+(7,0.673659036749)
+(8,0.721296411495)
+(9,0.767653893262)
+(10,0.80191080235)
+#+end_example
