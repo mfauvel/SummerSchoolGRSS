@@ -16,7 +16,7 @@ im = sc.fit_transform(im)
 
 # Do KPCA
 kpca = KernelPCA(kernel='rbf',gamma=1.0/b,n_jobs=-1)
-kpca.fit(im[::50,:]) # Use a subset of the total pixel number
+kpca.fit(im[::50,:]) # Use a subset of the total number of pixels
 
 # Plot explained variance
 l = kpca.lambdas_

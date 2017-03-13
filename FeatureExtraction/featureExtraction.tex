@@ -1,4 +1,4 @@
-% Created 2017-03-11 Sat 13:16
+% Created 2017-03-13 Mon 10:33
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,aspectratio=1610]{beamer}
 \usepackage[utf8]{inputenc}
@@ -39,8 +39,8 @@
 \end{frame}
 
 \section{Motivations}
-\label{sec:orgf88b702}
-\begin{frame}[label={sec:orgb9ef503}]{Illustration}
+\label{sec:orga952267}
+\begin{frame}[label={sec:org7d2e3e4}]{Illustration}
 \begin{itemize}
 \item <1-> \alert{Curse of dimensionality}: it is not possible to get enough data to cover all the observation space.
 \begin{center}
@@ -56,7 +56,7 @@
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orge64b0a3}]{Application}
+\begin{frame}[label={sec:orgcb96743}]{Application}
 \begin{itemize}
 \item Feature extraction is important in remote sensing because:
 \begin{itemize}
@@ -83,10 +83,10 @@
 
 
 \section{Physical Indices}
-\label{sec:orgc74d3a1}
+\label{sec:orgd920208}
 \subsection{Introduction}
-\label{sec:org79fae89}
-\begin{frame}[label={sec:orgc5a9afc}]{Spectral indices}
+\label{sec:org8453c6a}
+\begin{frame}[label={sec:org5909760}]{Spectral indices}
 \begin{itemize}
 \item Spectral indices are a linear/non-linear combination of two (or more) spectral bands.
 \item They provides information as a \emph{single number} about:
@@ -113,7 +113,7 @@ Soil-adjusted vegetation index & \((1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org042cc7d}]{Conventional Indices}
+\begin{frame}[label={sec:org2a74694}]{Conventional Indices}
 Index database : \url{http://www.indexdatabase.de/}
 
 \begin{center}
@@ -137,8 +137,8 @@ Soil Brightness Index & \(0.406R_{\lambda{550}}+0.600R_{\lambda{650}}+0.645R_{\l
 \end{frame}
 
 \subsection{Vegetation Indices}
-\label{sec:orgee15017}
-\begin{frame}[label={sec:org34b4d46}]{Normalized difference vegetation index}
+\label{sec:orgdda5cc8}
+\begin{frame}[label={sec:org18c72d1}]{Normalized difference vegetation index}
 $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$$
 \begin{itemize}
 \item \(-1\leq \text{NVDI} \leq 1\)
@@ -162,8 +162,8 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{center}
 \end{frame}
 \subsection{Case study}
-\label{sec:orgbdc2a58}
-\begin{frame}[label={sec:org8413214}]{University of Pavia}
+\label{sec:org9fb4cc9}
+\begin{frame}[label={sec:org9c61535}]{University of Pavia}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -183,7 +183,7 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org57c4c04}]{Orfeo-Toolbox}
+\begin{frame}[fragile,label={sec:org0e8c941}]{Orfeo-Toolbox}
  \begin{itemize}
 \item \href{https://www.orfeo-toolbox.org/}{OTB} is a C++ library for remote sensing images processing.
 \item It is free, open-source and available for most OS (window, apple, linux)
@@ -203,7 +203,7 @@ otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org9cefc90}]{University of Pavia - Spectral Indices}
+\begin{frame}[label={sec:org4d0b7ef}]{University of Pavia - Spectral Indices}
 \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{center}
@@ -225,7 +225,7 @@ otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org190dc40}]{Where is the vegetation 1/2 ?}
+\begin{frame}[fragile,label={sec:orgcd6ecd7}]{Where is the vegetation 1/2 ?}
    \begin{center}
   \begin{tikzpicture}
     \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Density plot of the NDVI,xmin=-0.6,xmax=1,ymin=0,ymax=0.01]
@@ -243,7 +243,7 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgf28b76e}]{Where is the vegetation 2/2 ?}
+\begin{frame}[label={sec:org9f7876e}]{Where is the vegetation 2/2 ?}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -260,8 +260,8 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 \end{frame}
 
 \subsection{Question}
-\label{sec:orgc854835}
-\begin{frame}[label={sec:org314f229}]{Could you find the good one ?}
+\label{sec:org400314b}
+\begin{frame}[label={sec:org8b48b31}]{Could you find the good one ?}
  \centerline{\begin{tabular}{cc}
     \includegraphics[width=0.4\linewidth]{figures/image1.jpg} & \begin{tikzpicture}\pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
       \begin{axis}[ytick=\empty,xmin=-0.5,xmax=0.9,ymin=0,width=0.5\linewidth,axis y line=center,axis x line=bottom,legend columns=4]
@@ -283,10 +283,10 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 From the histogram, which one does correspond to the NDVI of the image ?
 \end{frame}
 \section{Statistical Feature Extraction}
-\label{sec:org18d9ab5}
+\label{sec:org79330e5}
 \subsection{Unsupervised}
-\label{sec:org4031569}
-\begin{frame}[label={sec:org880e147}]{Principal Components Analysis}
+\label{sec:org737bcbe}
+\begin{frame}[label={sec:orgd6d5b16}]{Principal Components Analysis}
 \begin{itemize}
 \item Linear transformation used to reduce the dimensionality of the data \cite{jolliffe2002principal}.
 $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
@@ -311,7 +311,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgbc29acd}]{Maximization of the variance 1/2}
+\begin{frame}[label={sec:orga203c51}]{Maximization of the variance 1/2}
 \begin{itemize}
 \item <1-> Search \(\mathbf{v}_1\) such as \(\max\text{var}(z_1)\):
 \begin{eqnarray*}
@@ -337,7 +337,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
 \end{eqnarray*}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orge7bd2f3}]{Maximization of the variance 2/2}
+\begin{frame}[label={sec:org80974a9}]{Maximization of the variance 2/2}
 \begin{itemize}
 \item <1-> Search \(\mathbf{v}_2\) such as \(\max\text{var}(z_2)\) and \(\langle\mathbf{v}_2,\mathbf{v}_2\rangle=1\) and \(\langle\mathbf{v}_1,\mathbf{v}_2\rangle=0\)
 \item <2-> Lagrangian:
@@ -363,7 +363,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
 \item <7-> \(\mathbf{v}_k\) is the eigenvector corresponding the \emph{\(k^{\text{th}}\) largest} eigenvalues
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org2856e27}]{PCA in practice}
+\begin{frame}[label={sec:org2fa353f}]{PCA in practice}
 \begin{enumerate}
 \item Empirical estimation the mean value:
 \begin{eqnarray*}
@@ -378,7 +378,7 @@ $$\frac{\sum_{i=1}^p\lambda_i}{\sum_{i=1}^d\lambda_i}$$
 \item Tips for high dimensional data set: if \(n<d\) see \cite{manolakis2016hyperspectral} page 420
 \end{enumerate}
 \end{frame}
-\begin{frame}[fragile,label={sec:org1edab08}]{PCA case study 1/3}
+\begin{frame}[fragile,label={sec:orgd343809}]{PCA case study 1/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
@@ -405,7 +405,7 @@ D = sp.concatenate((wave[:,sp.newaxis],pca.components_[:3,:].T),axis=1)
 sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:orgf5e56dc}]{PCA case study 2/3}
+\begin{frame}[label={sec:orgbb27100}]{PCA case study 2/3}
 \begin{itemize}
 \item Explained variance
 \begin{center}
@@ -431,7 +431,7 @@ sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:orgab9d789}]{PCA case study 3/3}
+\begin{frame}[fragile,label={sec:org0a96f5d}]{PCA case study 3/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 # Projection of the first PCs
 imp = sp.dot(im,pca.components_[:3,:].T)
@@ -455,7 +455,7 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orgb4829a4}]{Kernel PCA}
+\begin{frame}[label={sec:org9ab2bfa}]{Kernel PCA}
 \begin{itemize}
 \item PCA is limited to second order information
 \item To capture higher-order statistics, it is possible to map the data onto another space \(\mathcal{H}\)
@@ -522,7 +522,7 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org66f0a4b}]{Kernel PCA in practice}
+\begin{frame}[label={sec:org3e49476}]{Kernel PCA in practice}
 \begin{itemize}
 \item Choose the kernel and its parameters
 \item Compute the kernel matrix \(\mathbf{K}\) for all the pixels (or a subset)
@@ -541,8 +541,10 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org2f8d4e2}]{KPCA case study 1/3}
- \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+\begin{frame}[fragile,label={sec:org3ebec8e}]{KPCA case study 1/3}
+ From \cite{fauvel2009kernel}.
+
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
 from sklearn.decomposition import KernelPCA
@@ -561,10 +563,10 @@ im = sc.fit_transform(im)
 
 # Do KPCA
 kpca = KernelPCA(kernel='rbf',gamma=1.0/b,n_jobs=-1)
-kpca.fit(im[::50,:]) # Use a subset of the total pixel number
+kpca.fit(im[::50,:]) # Use a subset of the total number of pixels
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:orgef06dc6}]{KPCA case study 2/3}
+\begin{frame}[label={sec:org2d326fd}]{KPCA case study 2/3}
 \begin{itemize}
 \item Explained variance
 \begin{center}
@@ -608,7 +610,7 @@ kpca.fit(im[::50,:]) # Use a subset of the total pixel number
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:orga380b9d}]{KPCA case study 3/3}
+\begin{frame}[fragile,label={sec:org96f779d}]{KPCA case study 3/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 imp = kpca.transform(im)[:,:3]
 imp.shape = (h,w,3)
@@ -632,5 +634,117 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
 \end{frame}
 
 \subsection{Supervised}
-\label{sec:org9c68c9a}
+\label{sec:org8c7499a}
+\begin{frame}[label={sec:org0f2b242}]{Fisher's Discriminant Analysis}
+\begin{itemize}
+\item We observe some \(\{\mathbf{x}_i,y_i\}_{i=1}^n\)
+\item Use the label information to find the linear features that highlight differences among classes
+
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[width=0.6\textwidth,grid,small,xmin=-5,xmax=5,ymin=-5,ymax=5]
+      \addplot[scatter, only marks,scatter src=explicit]table[col sep=comma,meta index=2,x index =0,y index=1] {figures/lda_data.csv};      
+      \addplot[domain=-5:5,very thick] {-x/0.52306077251960925*0.85229538790913895 - 3.65687201/3.04406312};
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+\item FDA: find \(\mathbf{a}\) such as the ratio between the \emph{between projected variance} and the \emph{sample projected variance} is maximal
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org7ec3bef}]{FDA Algorithm}
+\begin{itemize}
+\item Between-class covariance matrix:
+\begin{eqnarray*}
+  \mathbf{B} = \frac{1}{n}\sum_{c=1}^Cn_c(\boldsymbol{\mu}_c-\boldsymbol{\mu})(\boldsymbol{\mu}_c-\boldsymbol{\mu})^\top
+\end{eqnarray*}
+\item Sample covariance matrix
+\begin{eqnarray*}
+  \boldsymbol{\Sigma} = \frac{1}{n-1}\sum_{i=1}^n(\mathbf{x}_i-\boldsymbol{\mu})(\mathbf{x}_i-\boldsymbol{\mu})^\top
+\end{eqnarray*}
+\item The Fisher discriminant subspace is given by the eigenvectors of \(\boldsymbol{\Sigma}^{(-1)}\mathbf{B}\)
+\item Remark: there are at most \(C-1\) eigenvectors because \(\text{Rank}(\mathbf{B})\leq C-1\).
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile,label={sec:orge63a4c3}]{FDA case study 1/3}
+ \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+import rasterTools as rt
+import scipy as sp
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# Load data set
+X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+wave = sp.loadtxt('../Data/waves.csv',delimiter=',')
+
+# Select the same number of samples
+nt = 900
+xt,yt=[],[]
+for i in sp.unique(y):
+    t = sp.where(y==i)[0]
+    nc = t.size
+    rp =  sp.random.permutation(nc)
+    xt.extend(X[t[rp[0:nt]],:])
+    yt.extend(y[t[rp[0:nt]]])
+
+xt = sp.asarray(xt)
+yt = sp.asarray(yt)
+
+# Do LDA
+lda = LinearDiscriminantAnalysis(solver='eigen',shrinkage='auto')
+lda.fit(xt,yt.ravel())
+\end{minted}
+\end{frame}
+\begin{frame}[label={sec:orgcc58c9b}]{FDA case study 2/3}
+\begin{itemize}
+\item Projection on Fisher components
+\begin{center}
+  \begin{tabular}{cc}
+ \begin{tikzpicture}
+      \begin{axis}[width=0.4\textwidth,height=0.3\textwidth,xticklabels={,,},yticklabels={,,},grid,xlabel=FC 1,ylabel=FC 2]
+        \addplot[scatter,only marks,scatter src=explicit,opacity=0.5] table[col sep =comma,meta index=4,x index=0,y index=1] {figures/lda_proj.csv};
+      \end{axis}
+    \end{tikzpicture}&
+                       \begin{tikzpicture}
+                         \begin{axis}[width=0.4\textwidth,height=0.3\textwidth,xticklabels={,,},yticklabels={,,},grid,,xlabel=FC 3,ylabel=FC 4]
+                           \addplot[scatter,only marks,scatter src=explicit,opacity=0.5] table[col sep =comma,meta index=4,x index=3,y index=2] {figures/lda_proj.csv};
+                         \end{axis}
+                       \end{tikzpicture}
+  \end{tabular}
+\end{center}
+\item Fisher components
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[width=0.9\textwidth,height=0.3\textwidth,grid,xmin=400,xmax=900,cycle list name=color list]
+      \addplot+[thick] table[col sep=comma,x index=0,y index=1] {figures/lda_pcs.csv};
+      \addplot+[thick] table[col sep=comma,x index=0,y index=2] {figures/lda_pcs.csv};
+      \addplot+[thick] table[col sep=comma,x index=0,y index=3] {figures/lda_pcs.csv};
+      \legend{pc1,pc2,pc3};
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile,label={sec:orgb95dabd}]{FDA case study 3/3}
+ \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+im,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=im.shape
+im.shape=(h*w,b)
+imp = lda.transform(im)[:,:3]
+imp.shape = (h,w,3)
+# Save image
+rt.write_data('../Data/lda_university.tif',imp,GeoT,Proj)
+\end{minted}
+\begin{columns}
+\begin{column}{0.3\columnwidth}
+\includegraphics[width=0.75\linewidth]{./figures/university_lda1.png}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\includegraphics[width=0.75\linewidth]{./figures/university_lda2.png}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\includegraphics[width=0.75\linewidth]{./figures/university_lda3.png}
+\end{column}
+\end{columns}
+\end{frame}
 \end{document}
