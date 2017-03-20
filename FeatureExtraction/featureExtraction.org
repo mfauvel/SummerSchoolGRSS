@@ -57,7 +57,6 @@
     * Linear filters,
     * Non linear techniques (Mathematical Morphology)
 
-    
 * Physical Indices                                                   :export:
 ** Introduction
 *** Spectral indices
@@ -777,12 +776,498 @@ rt.write_data('../Data/lda_university.tif',imp,GeoT,Proj)
 #+ATTR_LATEX: :width 0.75\linewidth :center
 [[file:./figures/university_lda3.png]]
 
+*** Feature selection
+- Feature selection: pick few features /from/ the original ones (no combination)
+- In general, for feature selection, we need:
+  + /Criterion/ to evaluate how perform the model with a given subset
+  + /Optimization   procedure/   to  find   the   subset   that  minimizes/maximizes the criterion
+- For instance:   
+  #+ATTR_LATEX: :booktabs t
+  | Criterion            | Optimization      | Ref.                        |
+  |----------------------+-------------------+-----------------------------|
+  | Entropy              | Genetic algorithm | cite:chein2007hyperspectral |
+  | Jeffries Matusita    | Exhaustive Search | cite:4069122                |
+  | Classification error | Forward search/GA | cite:lebris:fs,7847352      |
+  | $\ell_1$ norm        | Linear-SVM        | cite:tuia2014automatic      |
+  
+*** Large scale feature selection with GMM
+- Fast  forward strategy  based  on  a nonlinear  model  driven by  an
+  estimate of the classification error or a measure of separability:
+  #+ATTR_LATEX: :booktabs t
+  | Criterion                    | Type       | Complexity |
+  |------------------------------+------------+------------|
+  | Overall accuracy             | Accuracy   | High       |
+  | Cohen's kappa                | Accuracy   | High       |
+  | F1 mean                      | Accuracy   | High       |
+  |------------------------------+------------+------------|
+  | Kullback-Leibler divergences | Divergence | Low        |
+  | Jeffries-Matusita distance   | Divergence | Low        |
+- Use /Gaussian Mixture Models/ (natural extension du multiclass problem)
+- Fast update and fast forward search cite:7847352: based on linear algebra
 
-* Spatial feature extaction
+*** Algorithm 1/2
+    The forward feature selection works as follow:
+    - Starts with an empty pool $F$ of selected features,
+    - Select the  feature $f_1$ that  provides the best value  for the
+      selected criterion and add it to $F$.
+    - Select  the  feature $f_2$  such  that  the couple  of  features
+      $(f_1,f_2)$ provides  the best value for  the selected criterion
+      and add it to $F$.
+    - Select  the feature  $f_3$  such that  the  triplet of  features
+      $(f_1,f_2,f_3)$ ...
+    - ...
+    - The algorithm stops either if the increase of the criterion is too
+      low or if the maximum number of features is reached.
 
-** Linear filters
+*** Algorithm 2/2
 
+#+BEGIN_EXPORT latex
+\tikzset{noeud/.style={minimum width=1.5cm,minimum height=1cm,text width = 1.25cm,text centered,rounded corners=1pt,draw,rectangle,thick}}
+\tikzstyle{arrow}=[->,>=stealth,thick]
+\tikzstyle{arrow2}=[dashed,->,>=stealth,thick]
+\centerline{\resizebox{0.65\linewidth}{!}{\begin{tikzpicture}
+    % Nodes
+    \node[noeud] (S) at (0,0) {$\mathcal{S}$};
+    \node[noeud] (S1) at (-4,-2) {$\mathcal{S}_1$};
+    \node[noeud] (S2) at (-2,-2) {$\mathcal{S}_2$};
+    \node[noeud] (S3) at (0,-2) {$\mathcal{S}_3$};
+    \node[noeud] (S4) at (2,-2) {$\mathcal{S}_4$};
+    \node[noeud,magenta] (S5) at (4,-2) {$\mathcal{S}_5$};
+    \node[noeud] (model) at (-3,0) {Model};
+    \node[noeud,orange] (update) at (-2,-4) {Update};
+    \node[noeud,orange] (predict) at (2,-4) {OA($\lambda_i$)};
+    %Arrows
+    \draw[arrow] (S.south)|-(0,-1)-|(S1.north);
+    \draw[arrow] (-2,-1)-|(S2.north);
+    \draw[arrow] (0,-1)-|(S3.north);
+    \draw[arrow] (2,-1)-|(S4.north);
+    \draw[arrow] (0,-1)-|(S5.north);
+    \draw[arrow] (S.west) -- (model.east);
+    \draw[arrow2] (model.west) -| (-5,0) |- (-5,-4) -- (update.west);
+    \draw[arrow] (S5.south) |- (2,-3) -| (update.north);
+    \draw[arrow2] (update.east) -- (predict.west);
+    \draw[arrow] (2,-3) -- (predict.north);
+    \draw[dotted,->,>=stealth,thick] (predict.south) -- (2,-5);
+    \node (plot) at (-0.7,-7.8) {\begin{axis}[x tick label style={rotate=45,anchor=east},grid,xmin=430,xmax=860,xlabel=$\lambda_i$,ylabel=OA,footnotesize]
+        \addplot[thick,smooth] table[x=var,y=error,col sep=comma]  {figures/kcv_1.csv};
+      \end{axis}};
+\end{tikzpicture}}}
+#+END_EXPORT
+   
+*** FFFS case study 1/3
+#+BEGIN_SRC python :exports code :tangle ../Codes/fffsPavia.py
+import rasterTools as rt
+import scipy as sp
+import npfs as npfs
+
+# Load data set
+X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+wave = sp.loadtxt('../Data/waves.csv',delimiter=',') 
+
+# Select the same number of samples
+nt = 900
+xt,yt=[],[]
+for i in sp.unique(y):
+    t = sp.where(y==i)[0]
+    nc = t.size
+    rp =  sp.random.permutation(nc)
+    xt.extend(X[t[rp[0:nt]],:])
+    yt.extend(y[t[rp[0:nt]]])
+
+xt = sp.asarray(xt)
+yt = sp.asarray(yt)
+
+# Do FFFS
+maxVar = 12
+model = npfs.GMMFeaturesSelection()
+model.learn_gmm(xt,yt)
+idx, crit, [] = model.selection('forward',xt, yt,criterion='kappa', varNb=maxVar, nfold=5)
+#+END_SRC
+
+#+BEGIN_SRC python :exports none :tangle ../Codes/fffsPavia.py
+for i in range(maxVar):
+    print "({0},{1})".format(wave[idx[i]],crit[i])
+
+for i in range(maxVar):
+    print "({0},{1})".format(i+1,crit[i])
+
+# Save selected feature
+D = sp.copy(model.mean[0,idx[:2]][:,sp.newaxis])
+
+for i in xrange(1,9):
+    D = sp.concatenate((D,model.mean[i,idx[:2]][:,sp.newaxis]),axis=1)
+
+D = D.T
+C = sp.arange(1,10)
+D = sp.concatenate((D,C[:,sp.newaxis]),axis=1)
+sp.savetxt("../FeatureExtraction/figures/fffsMean.csv",D,delimiter=',')
+#+END_SRC
+
+*** FFFS case study 2/3
+- Criterion
+  #+BEGIN_EXPORT latex
+  \begin{center}
+      \begin{tikzpicture}
+        \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,ylabel=Kappa coefficient,xlabel=Number of spectral features,grid]
+          \addplot[thick,mark=*,] coordinates {(1,0.546805555556)
+(2,0.736944444444)
+(3,0.847361111111)
+(4,0.868888888889)
+(5,0.883333333333)
+(6,0.894583333333)
+(7,0.901805555556)
+(8,0.906527777778)
+(9,0.907916666667)
+(10,0.910972222222)
+(11,0.911805555556)
+(12,0.913888888889)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{center}
+  #+END_EXPORT
+- Mean projection on best bands
+
+
+  #+BEGIN_EXPORT latex
+  \begin{center}
+  \begin{tikzpicture}                           
+  \begin{axis}[width=0.4\textwidth,height=0.3\textwidth,xticklabels={,,},yticklabels={,,},grid,xlabel={$\hat{\lambda}_1 = 555$},ylabel={$\hat{\lambda}_2 = 798$}]
+  \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma, meta index=2,x index=0,y index=1] {figures/fffsMean.csv};
+  \end{axis}
+  \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+  
+* Spatial feature extaction                                          :export:
+*** Why spatial feature extraction?
+#+BEGIN_EXPORT latex
+\centerline{\begin{tabular}{ccc}
+\includegraphics[width=0.2\linewidth]{figures/rgb_house_shuffle} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_sort} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_original}\\
+\includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist}
+\end{tabular}}
+#+END_EXPORT
+
+** Spatial filters
+*** Spatial neighborhood
+- The neighborhood of a given pixel is the set of pixels that are connected to it.
+- For a flat (grayscale) image :
+  #+BEGIN_EXPORT latex
+  \centerline{\newcounter{a}\newcounter{b}\begin{tikzpicture}
+      \foreach \x in {1,...,3}
+      \foreach \y in {1,...,3}
+      { 
+        \draw (\x,\y)+(-.5,-.5) rectangle ++(.5,.5);
+        \pgfmathsetcounter{a}{\x-2}
+        \pgfmathsetcounter{b}{2-\y}
+        \draw (\x,\y) node{$\mathbf{x}_{\thea,\theb}$};
+      }
+      \draw[red,thick] (1.5,0.5) rectangle +(1,3);
+      \draw[red,thick] (0.5,1.5) rectangle +(3,1);
+      \draw (2,0) node{4-connected};
+    \end{tikzpicture}\hspace{1cm}\begin{tikzpicture}
+      \foreach \x in {1,...,3}
+      \foreach \y in {1,...,3}
+      { 
+        \draw (\x,\y)+(-.5,-.5) rectangle ++(.5,.5);
+        \pgfmathsetcounter{a}{\x-2}
+        \pgfmathsetcounter{b}{2-\y}
+        \draw (\x,\y) node{$\mathbf{x}_{\thea,\theb}$};
+      }
+      \draw[red,thick] (0.5,0.5) rectangle(3.5,3.5);
+      \draw (2,0) node{8-connected};
+    \end{tikzpicture}}
+  #+END_EXPORT
+- Wide range of processing are  based on pixel neighborhood
+  + De noising,
+  + Texture analysis,
+  + Edges detection,
+  + Pattern recognition,
+  + ...
+*** Template filters
+_Steps_:
+1. Define the template  $G$: 4/8-connected and size
+2. Define  the processing  $f$ on the  neighborhood. If  $f$ is linear $\leftrightarrow$ convolution.
+3. Scan all the pixels:
+#+BEGIN_EXPORT latex
+$$\mathbf{x}_{ij}^f = f(\mathbf{x}_1,\ldots,\mathbf{x}_N),\ \mathbf{x}_n\in G(i,j)$$
+#+END_EXPORT
+
+#+BEGIN_CENTER
+Max Filter
+#+END_CENTER
+#+BEGIN_EXPORT latex
+\centerline{\resizebox{0.5\textwidth}{!}{\begin{tikzpicture}
+        \foreach \x in {1,...,6}
+        \foreach \y in {1,...,6}
+        {
+          \draw (\x,\y)+(-.5,-.5) rectangle ++(.5,.5);
+          \draw (\x,\y) node{\pgfmathparse{int(10*(exp(-\x/10) + exp(\y/10)))}\pgfmathresult};
+        }
+        \draw[help lines,red,very thick](3.5,3.5) rectangle +(1,1);
+        \draw[help lines,red,very thick](2.5,2.5) rectangle +(3,3);
+        \foreach \x in {1,...,6}
+        \foreach \y in {1,...,6}
+        {
+          \draw (\x+7,\y)+(-.5,-.5) rectangle ++(.5,.5);
+        }
+        \draw[help lines,red,very thick](3.5+7,3.5) rectangle +(1,1);
+        \draw[red,very thick](11,4) node{23};
+        \draw[->,red,thick]  (4.25,4) -- (10.75,4);
+      \end{tikzpicture}}}
+#+END_EXPORT
+*** Some filters
+- G = $\begin{bmatrix} 1 & 1  & 1 \\1 & 1  & 1 \\1 & 1  & 1 \end{bmatrix}$, for a $3\times 3$ neighborhood.
+- Mean filter
+  $$\mathbf{x}^{m}(x,y) = \frac{1}{9}\sum_{i,j=-1}^1\mathbf{x}(x+i,y+j)$$
+- Variance filter:
+  $$\mathbf{x}^{v}(x,y) = \frac{1}{9}\sum_{i,j=-1}^1\big(\mathbf{x}(x+i,y+j)-\mathbf{x}^{m}(x,y)\big)^2$$
+- Range filter:
+  $$\mathbf{x}^{r}(x,y) = \max_{i,j\in G}[\mathbf{x}(x+i,y+j)] - \min_{i,j\in G}[\mathbf{x}(x+i,y+j)]$$
+- Median filter:
+  $$\mathbf{x}^{m}(x,y) = \text{median}_{i,j\in G}[\mathbf{x}(x+i,y+j)]$$
+*** Template filters in action 1/3
+#+BEGIN_CENTER
+*For multidimensional images: Use spectral feature extraction to get flat images!* See [[#spatial:mvi]]
+#+END_CENTER
+
+#+BEGIN_SRC sh :tangle ../Codes/template_filter.sh :exports code
+# Compute the different filters with a template of size 3x3 and 11x11
+for i in 3 11
+do
+    # Mean filter
+    otbcli_BandMathX -il ../Data/pca_university.tif -out ../Data/pca_mean_${i}_${i}_university.tif \
+		     -exp "mean(im1b1N${i}x${i}); mean(im1b2N${i}x${i}); mean(im1b3N${i}x${i})"
+
+    # Var filter
+    otbcli_BandMathX -il ../Data/pca_university.tif -out ../Data/pca_std_${i}_${i}_university.tif \
+		     -exp "var(im1b1N${i}x${i}); var(im1b2N${i}x${i}); var(im1b3N${i}x${i})"
+
+    # Range filter
+    otbcli_BandMathX -il ../Data/pca_university.tif -out ../Data/pca_range_${i}_${i}_university.tif \
+		     -exp "vmax(im1b1N${i}x${i})-vmin(im1b1N${i}x${i}); vmax(im1b2N${i}x${i})-vmin(im1b2N${i}x${i});\
+                     vmax(im1b3N${i}x${i})-vmin(im1b3N${i}x${i})"
+
+    # Median filter
+    otbcli_BandMathX -il ../Data/pca_university.tif -out ../Data/pca_median_${i}_${i}_university.tif \
+		     -exp "median(im1b1N${i}x${i}); median(im1b2N${i}x${i}); median(im1b3N${i}x${i})"
+done
+#+END_SRC
+
+*** Template filters in action 2/3
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.22\linewidth :center :options [trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true]
+[[file:./figures/university_pc1.png]]
+#+END_CENTER
+
+**** Mean                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_mean_3_3.png]]
+**** STD                                                           :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_std_3_3.png]]
+**** Range                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_range_3_3.png]]
+**** Median                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_median_3_3.png]]
+*** Template filters in action 3/3
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.22\linewidth :center :options [trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true]
+[[file:./figures/university_pc1.png]]
+#+END_CENTER
+
+**** Mean                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_mean_11_11.png]]
+**** STD                                                           :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_std_11_11.png]]
+**** Range                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_range_11_11.png]]
+**** Median                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 6cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1_median_11_11.png]]
 ** Mathematical morphology
+*** Dilation and erosion
+- Mathematical morphology: non-linear image processing.
+- A lot of applications in geoscience and remote sensing, see cite:soille:pesaresi
+- _Erosion_: template filter with a $\min$ operation in $G$ (called /structuring element/)
+- _Dilation_: template filter with a $\max$ operation in $G$
+
+**** erosion                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/ero.pdf]]
+**** original                                                      :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/orig.pdf]]
+**** dilation                                                      :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/dil.pdf]]
+*** Effets of structuring elements
+**** diamond                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/dil_disk.png]]
+
+#+ATTR_LATEX: :align |c|c|c|c|c|
+|---+---+---+---+---|
+| 0 | 0 | 1 | 0 | 0 |
+|---+---+---+---+---|
+| 0 | 1 | 1 | 1 | 0 |
+|---+---+---+---+---|
+| 1 | 1 | 1 | 1 | 1 |
+|---+---+---+---+---|
+| 0 | 1 | 1 | 1 | 0 |
+|---+---+---+---+---|
+| 0 | 0 | 1 | 0 | 0 |
+|---+---+---+---+---|
+**** square                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/dil_square.png]]
+
+#+ATTR_LATEX: :align |c|c|c|c|c|
+|---+---+---+---+---|
+| 0 | 0 | 0 | 0 | 0 |
+|---+---+---+---+---|
+| 0 | 1 | 1 | 1 | 0 |
+|---+---+---+---+---|
+| 0 | 1 | 1 | 1 | 0 |
+|---+---+---+---+---|
+| 0 | 1 | 1 | 1 | 0 |
+|---+---+---+---+---|
+| 0 | 0 | 0 | 0 | 0 |
+|---+---+---+---+---|
+
+**** line                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :float t :center :width 0.85\linewidth :height 0.85\linewidth
+[[file:./figures/dil_line.png]]
+
+#+ATTR_LATEX: :align |c|c|c|c|c|
+|---+---+---+---+---|
+| 0 | 0 | 0 | 0 | 1 |
+|---+---+---+---+---|
+| 0 | 0 | 0 | 1 | 0 |
+|---+---+---+---+---|
+| 0 | 0 | 1 | 0 | 0 |
+|---+---+---+---+---|
+| 0 | 1 | 0 | 0 | 0 |
+|---+---+---+---+---|
+| 1 | 0 | 0 | 0 | 0 |
+|---+---+---+---+---|
+
+*** Opening and closing
+- _Opening_:
+  + /Erosion/ followed by a /dilation/
+  + Remove bright objects that are smaller than the SE
+- <2> _Opening by reconstruction_:
+  + /Erosion/ followed by a /reconstruction/
+  + /Completely/ removes bright objects that are smaller than the SE, otherwise preserve it
+- _Closing_:
+  + /Dilation/ followed by an /erosion/
+  + Remove dark objects that are smaller than the SE
+- <2> _Closing by reconstruction_:
+  + /Dilation/ followed by an /erosion/
+  + /Completely/ removes dark objects that are smaller than the SE, otherwise preserve it
+
+**** Closing                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.2
+:END:
+#+ATTR_LATEX: :float t :center :width 1\linewidth :height 1\linewidth
+[[file:./figures/close.pdf]]
+**** Closing by reconstruction                                     :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.2
+:END:
+#+LaTeX: \only<2>{
+#+ATTR_LATEX: :float t :center :width 1\linewidth :height 1\linewidth
+[[file:./figures/geo_close.pdf]]
+#+LaTeX: }
+**** Opening                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.2
+:END:
+#+ATTR_LATEX: :float t :center :width 1\linewidth :height 1\linewidth
+[[file:./figures/open.pdf]]
+**** Closing by reconstruction                                     :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.2
+:END:
+#+LaTeX: \only<2>{
+#+ATTR_LATEX: :float t :center :width 1\linewidth :height 1\linewidth
+[[file:./figures/geo_open.pdf]]
+#+LaTeX: }
+*** Opening and closing profile
+- For a  given $B$,  $\gamma_{B}^r$  (resp. $\phi_{B}^r$)   indicates which clear (dark) objects fit $B$.
+  #+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tikzpicture}[]
+      \node at (0,0) {\includegraphics[width=0.2\textwidth,height=0.215\textheight]{figures/orig}};
+      \node at (5,0) {\includegraphics[width=0.2\textwidth,height=0.215\textheight]{figures/geo_open}};
+      \node at (10,0) {\includegraphics[width=0.2\textwidth,height=0.215\textheight]{figures/geo_close}};
+      \draw[->,red,very thick] (-0.9,-0.85) -- node[above] {$\gamma_{B}^r$} (4,-0.85);
+      \draw[->,red,very thick] (-0.85,-0.15) -- node[above] {$\phi_{B}^r$} (9,-0.15);
+    \end{tikzpicture}
+  \end{center}
+  #+END_EXPORT
+- Applying $\gamma_{B_i}$ with a set of $\big\{B_i|B_{i}\subset B_{i+1},i\in[1,\ldots,n]\big\}$ : \textcolor{magenta}{Opening Profile}
+- Applying $\phi_{B_i}$ with a set of $\big\{B_i|B_{i}\subset B_{i+1},i\in[1,\ldots,n]\big\}$ : \textcolor{magenta}{Closing Profile}
+** Extension to multivalued images
+:PROPERTIES:
+:CUSTOM_ID: spatial:mvi
+:END:
+
+*** Ordering relation
+- MM is based on $\inf$ and $\sup$ operators
+- No unambiguous $\inf$/$\sup$ for pixel/vector:
+    $$\begin{bmatrix}1\\5\\2\end{bmatrix} \overset{?}{\lessgtr} \begin{bmatrix}0\\6\\1\end{bmatrix}$$
+- Marginal ordering $\Rightarrow$ by band filtering
+- Reduced ordering $\Rightarrow h:\mathbb{R}^d\to\mathbb{R}$
+  $$\mathbf{x}\mapsto h(x)$$
+- Use spectral feature extraction /then/ spatial feature extraction.
 * Figures                                                          :noexport:
 ** PCA
 #+BEGIN_SRC python :session :results output
@@ -900,3 +1385,4 @@ print clf.intercept_
 : [[ 1.86816687 -3.04406312]]
 : [-0.08378251]
 
+** FFFS

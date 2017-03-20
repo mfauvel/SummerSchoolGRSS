@@ -18,8 +18,6 @@ for i in sp.unique(y):
 
 xt = sp.asarray(xt)
 yt = sp.asarray(yt)
-print xt.shape
-print yt.shape
 
 # Do LDA
 lda = LinearDiscriminantAnalysis(solver='eigen',shrinkage='auto')
@@ -52,6 +50,5 @@ im,GeoT,Proj = rt.open_data('../Data/university.tif')
 im.shape=(h*w,b)
 imp = lda.transform(im)[:,:3]
 imp.shape = (h,w,3)
-
 # Save image
 rt.write_data('../Data/lda_university.tif',imp,GeoT,Proj)
