@@ -27,26 +27,35 @@
 #+LATEX_HEADER: \addbibresource{fe.bib}
 #+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
 #+LATEX_HEADER: \pgfplotsset{compat=newest}
+
+#+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=magenta}
 * Motivations                                                        :export:
 *** Illustration
 - <1-> *Curse of dimensionality*: it is not possible to get enough data to cover all the observation space.
   #+BEGIN_CENTER
   /High dimensional saces are mostly empty !/
   #+END_CENTER
-- <2> Multivariate data live in a lower dimensional space
+- <2> Multivariate data live in a lower dimensional space, but which one ?
   #+BEGIN_EXPORT latex
   \begin{center}
+    \begin{tabular}{cc}
     \begin{tikzpicture}
       \begin{axis}[grid=major,small]
         \addplot3 [mesh, samples=15, domain=-5:5] {x+y+1};
       \end{axis}
-    \end{tikzpicture}
+    \end{tikzpicture}&\begin{tikzpicture}
+                       \begin{axis}[grid=major,small]
+                         \addplot3 [mesh, samples=15, domain=-5:5] {x*x-2*y+1};
+                       \end{axis}
+                       \end{tikzpicture}     
+  \end{tabular}
   \end{center}
+
   #+END_EXPORT
 *** Application
 - Feature extraction is important in remote sensing because:
   + It reduces the size of the data,
-  + It limits the spatial and spectral redundancy,
+  + It limits the spatial and the spectral redundancy,
   + It permits visualization of the data,
   + It mitigates the /curse of dimensionality/.
 - Extraction techniques:
@@ -82,7 +91,7 @@ Index database : [[http://www.indexdatabase.de/]]
 #+ATTR_LATEX: :centering :booktabs t :font \small
 | Name                                        | Formulae  ($\lambda$ nm)                                                                                                                        |
 |---------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
-| Normalized Difference Vnegetation index     | $\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$                                                          |
+| Normalized Difference Vegetation index      | $\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$                                                          |
 | Modified Soil-Adjusted Vegetation Index     | $\dfrac{1}{2}\left[2R_{\lambda_{800}}+1 - \sqrt{(2R_{\lambda_{800}}+1)^2-8(R_{\lambda_{800}}-R_{\lambda_{670}})}\right]$                        |
 | Modified Chlorophyll Absorption Ratio Index | $\left[(R_{\lambda_{700}}-R_{\lambda_{670}})-0.2(R_{\lambda_{700}}-R_{\lambda_{550}})\right]\times\dfrac{R_{\lambda_{700}}}{R_{\lambda_{670}}}$ |
 |---------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -98,7 +107,7 @@ Index database : [[http://www.indexdatabase.de/]]
 $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$$
 #+END_EXPORT
 - $-1\leq \text{NVDI} \leq 1$
-- $\text{NDVI}< 0$: surfaces other thatn plant cover
+- $\text{NDVI}< 0$: surfaces other that plant cover
 - $\text{NDVI}\approx 0$: bare soil
 - $\text{NDVI}\geq 0.1$: vegetation cover (higher values correspond to more dense covers)
 
@@ -250,9 +259,7 @@ From the histogram, which one does correspond to the NDVI of the image ?
       \addplot[only marks,blue] table[x index=0,y index = 1,col sep =comma] {figures/pca_data.csv};
       \begin{scope}
       \addplot[very thick,red] coordinates { (0.080264,0.83834891)  (2.06023219,1.12070676)};
-      \addplot[very thick,red] coordinates { (0.92906917,  1.96951193)(1.21142702, -0.01045626)};
     \end{scope}
-
    \end{axis}                                  
   \end{tikzpicture}
 \end{center}
@@ -356,14 +363,16 @@ wave = sp.loadtxt('../Data/waves.csv',delimiter=',')
 pca = PCA()
 pca.fit(im)
 
-# Plot explained variance
-l = pca.explained_variance_ratio_
-print l[:5]
-print (l.cumsum()/l.sum())[:5]
-
 # Save Eigenvectors
 D = sp.concatenate((wave[:,sp.newaxis],pca.components_[:3,:].T),axis=1)
 sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
+#+END_SRC
+
+#+BEGIN_SRC python :tangle ../Codes/pcaPavia.py :exports none
+# Plot explained variance
+l = pca.explained_variance_
+print l[:5]
+print (l.cumsum()/l.sum())[:5]
 #+END_SRC
 *** PCA case study 2/3
 - Explained variance
@@ -374,7 +383,7 @@ sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
         \addplot[thick,mark=*,red] coordinates { (1,0.58318064)  (2,0.94418758)  (3,0.98856319)  (4,0.99157161)  (5,0.99366953)};
       \end{axis}
       \begin{axis}[width=0.5\textwidth,height=0.25\textwidth,axis y line*=right,axis x line=none,ylabel=Variance,yticklabel style=blue,ylabel style=blue, y axis line style=blue,ytick style=blue]
-        \addplot[thick,mark=*,blue] coordinates { (1,0.58318064)  (2,0.36100695)  (3,0.04437561)  (4,0.00300841)  (5,0.00209792)};
+        \addplot[thick,mark=*,blue] coordinates { (1,31328687.9)  (2,19393432.0)  (3,2383874.8)  (4,161613.08)  (5,112701.2)};
       \end{axis}
     \end{tikzpicture}
   \end{center}
@@ -645,7 +654,7 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
     \end{tikzpicture}
   \end{center}
   #+END_EXPORT
-- FDA: find $\mathbf{a}$ such as the ratio between the /between projected variance/ and the /sample projected variance/ is maximal
+- FDA: find $\mathbf{a}$ such as the ratio between the /between projected variance/ and the /sample projected variance/ is maximal cite:manolakis2016hyperspectral Chap. 8.8
 *** FDA Algorithm
 - Between-class covariance matrix:
   #+BEGIN_EXPORT latex
@@ -653,13 +662,19 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
     \mathbf{B} = \frac{1}{n}\sum_{c=1}^Cn_c(\boldsymbol{\mu}_c-\boldsymbol{\mu})(\boldsymbol{\mu}_c-\boldsymbol{\mu})^\top
   \end{eqnarray*}
   #+END_EXPORT
-- Sample covariance matrix
+- Class covariance matrix
   #+BEGIN_EXPORT latex
    \begin{eqnarray*}
-     \boldsymbol{\Sigma} = \frac{1}{n-1}\sum_{i=1}^n(\mathbf{x}_i-\boldsymbol{\mu})(\mathbf{x}_i-\boldsymbol{\mu})^\top
+     \boldsymbol{\Sigma}_c = \frac{1}{n_c-1}\sum_{i=1,i \in c}^{n_c}(\mathbf{x}_i-\boldsymbol{\mu}_c)(\mathbf{x}_i-\boldsymbol{\mu}_c)^\top
    \end{eqnarray*}
    #+END_EXPORT
-- The Fisher discriminant subspace is given by the eigenvectors of $\boldsymbol{\Sigma}^{(-1)}\mathbf{B}$
+- Within-class covariance matrix
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    \mathbf{W} = \sum_{c=1}^C\boldsymbol{\Sigma}_c
+  \end{eqnarray*}
+  #+END_EXPORT
+- The Fisher discriminant subspace is given by the eigenvectors of $\mathbf{W}^{(-1)}\mathbf{B}$
 - Remark: there are at most $C-1$ eigenvectors because $\text{Rank}(\mathbf{B})\leq C-1$.
 *** FDA case study 1/3
 
@@ -802,22 +817,22 @@ rt.write_data('../Data/lda_university.tif',imp,GeoT,Proj)
   |------------------------------+------------+------------|
   | Kullback-Leibler divergences | Divergence | Low        |
   | Jeffries-Matusita distance   | Divergence | Low        |
-- Use /Gaussian Mixture Models/ (natural extension du multiclass problem)
-- Fast update and fast forward search cite:7847352: based on linear algebra
+- Use /Gaussian Mixture Models/ (natural extension for multiclass problem)
+- Fast update and fast forward search cite:7847352: based on linear algebra of semi-definite positive matrices
 
 *** Algorithm 1/2
     The forward feature selection works as follow:
-    - Starts with an empty pool $F$ of selected features,
-    - Select the  feature $f_1$ that  provides the best value  for the
-      selected criterion and add it to $F$.
-    - Select  the  feature $f_2$  such  that  the couple  of  features
-      $(f_1,f_2)$ provides  the best value for  the selected criterion
-      and add it to $F$.
-    - Select  the feature  $f_3$  such that  the  triplet of  features
-      $(f_1,f_2,f_3)$ ...
-    - ...
-    - The algorithm stops either if the increase of the criterion is too
-      low or if the maximum number of features is reached.
+    1. Starts with an empty pool $F$ of selected features,
+    2. Select the  feature $f_1$ that  provides the best value  for the
+       selected criterion and add it to $F$.
+    3. Select  the  feature $f_2$  such  that  the couple  of  features
+       $(f_1,f_2)$ provides  the best value for  the selected criterion
+       and add it to $F$.
+    4. Select  the feature  $f_3$  such that  the  triplet of  features
+       $(f_1,f_2,f_3)$ ...
+    5. ...
+    6. The algorithm stops either if the increase of the criterion is too
+       low or if the maximum number of features is reached.
 
 *** Algorithm 2/2
 
@@ -937,7 +952,138 @@ sp.savetxt("../FeatureExtraction/figures/fffsMean.csv",D,delimiter=',')
   \end{tikzpicture}
   \end{center}
   #+END_EXPORT
+
+** Questions
+*** Number of features
+Given         a         set         of         observed         pixels
+$\mathcal{S}=\{(\mathbf{x}_i,y_i)\}_{i=1}^n$                       and
+$\mathbf{x}\in\mathbb{R}^{d}$. The number of classes $C$ is $3$.  What
+is the /maximum/ number of features that can be extracted with
+
+- <1> PCA, when $d=200$ and $n=400$: =a) 100, b) 200, c) 400 and d) 3=.
+- <2> PCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 3=.
+- <3> FDA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 3=.
+- <4> KPCA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 3=.
+- <5> KPCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 3=.
+- <6> FFFS, when $d=200$ and $n=100$:  =a) 2, b) 7, c) 15 and d) 200=.
+- <7> FFFS, when $d=200$ and $n=400$:  =a) 2, b) 7, c) 15 and d) 200=.
+
+#+BEGIN_SRC python :exports none
+import scipy as sp
+
+def numOfParameter(d,c):
+    return c*d*(d+3)/2+c-1
+
+n = 400
+d = 1
+c = 3
+
+while numOfParameter(d,c) < n:
+    d += 1
+
+return d
+#+END_SRC
+
+#+RESULTS:
+: 15
+*** KPCA
+#+BEGIN_SRC python :exports none
+import scipy as sp
+import matplotlib.pyplot as plt
+from sklearn.decomposition import KernelPCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import make_circles
+
+n = 100
+# Generate data
+# mu1 = sp.asarray([0,1])
+# mu2 = sp.asarray([0,0])
+# X = sp.concatenate((0.1*sp.random.randn(n,2) + mu1, 0.1*sp.random.randn(n,2)+mu2),axis=0)
+# Y = sp.concatenate((sp.zeros((n,1))+1,sp.zeros((n,1))+2),axis=0)
+
+X, y = make_circles(n_samples=n, factor=.3, noise=.05)
+
+X[:,0] *= 1000
+plt.scatter(X[:,0],X[:,1],c=y,s=30,alpha=0.5)
+
+
+D = sp.concatenate((X,y[:,sp.newaxis]),axis=1)
+sp.savetxt("figures/question_kpca_data.csv",D,delimiter=',')
+
+# Do KPCA without scaling
+kpca = KernelPCA(kernel='rbf',gamma=1.0/2,n_jobs=-1)
+Xp=kpca.fit_transform(X)[:,:2]
+plt.figure()
+plt.scatter(Xp[:,0],Xp[:,1],c=y,s=30,alpha=0.5)
+
+D = sp.concatenate((Xp,y[:,sp.newaxis]),axis=1)
+sp.savetxt("figures/question_kpca_proj.csv",D,delimiter=',')
+
+# Do KPCA with scaling
+sc = StandardScaler()
+Xs = sc.fit_transform(X)
+plt.figure()
+plt.scatter(Xs[:,0],Xs[:,1],c=y,s=30,alpha=0.5)
+
+D = sp.concatenate((Xs,y[:,sp.newaxis]),axis=1)
+sp.savetxt("figures/question_kpca_datas.csv",D,delimiter=',')
+
+kpca = KernelPCA(kernel='rbf',gamma=1.0/2,n_jobs=-1)
+Xp=kpca.fit_transform(Xs)[:,:2]
+plt.figure()
+plt.scatter(Xp[:,0],Xp[:,1],c=y,s=30,alpha=0.5)
+
+D = sp.concatenate((Xp,y[:,sp.newaxis]),axis=1)
+sp.savetxt("figures/question_kpca_projs.csv",D,delimiter=',')
+
+plt.show()
+#+END_SRC
+
+#+RESULTS:
+: None
+
+- Given the following data set, using the Gaussian kernel, how do you expect KPCA will behave: 
   
+  =a) as usual, b) poorly=
+ 
+- <3-> Gaussian kernel: 
+  #+BEGIN_EXPORT latex
+  \begin{eqnarray*}
+    k(\mathbf{x}_i,\mathbf{x}_j) = \exp\left[-\frac{\|\mathbf{x}_i-\mathbf{x}_j\|^2}{2\sigma^2}\right]  = \exp\left[-\frac{\sum_{l=1}^d (\mathbf{x}_{il}-\mathbf{x}_{jl})^2}{2\sigma^2}\right]
+  \end{eqnarray*}
+  #+END_EXPORT
+- <4-> _Solution_: scale the features (/e.g./, zero mean and unit variance)
+
+ 
+#+BEGIN_EXPORT latex
+  \begin{center}
+    \begin{tabular}{cccc}
+      \begin{tikzpicture}
+        \begin{axis}[width=0.24\textwidth,height=0.24\textwidth,grid,opacity=0.75]
+          \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/question_kpca_data.csv};
+        \end{axis}
+      \end{tikzpicture}&
+          \visible<2->{\begin{tikzpicture}
+        \begin{axis}[width=0.24\textwidth,height=0.24\textwidth,grid,opacity=0.75]
+          \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/question_kpca_proj.csv};
+        \end{axis}
+      \end{tikzpicture}}
+      &
+      \visible<5->{\begin{tikzpicture}
+        \begin{axis}[width=0.24\textwidth,height=0.24\textwidth,grid,opacity=0.75]
+          \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/question_kpca_datas.csv};
+        \end{axis}
+      \end{tikzpicture}}&
+      \visible<6>{\begin{tikzpicture}
+        \begin{axis}[width=0.24\textwidth,height=0.24\textwidth,grid,opacity=0.75]
+          \addplot[scatter,only marks,scatter src=explicit] table[col sep =comma,meta index=2,x index=0,y index=1] {figures/question_kpca_projs.csv};
+        \end{axis}
+      \end{tikzpicture}}
+    \end{tabular}
+
+  \end{center}
+#+END_EXPORT
+
 * Spatial feature extaction                                          :export:
 *** Why spatial feature extraction?
 #+BEGIN_EXPORT latex
@@ -1262,12 +1408,68 @@ done
 
 *** Ordering relation
 - MM is based on $\inf$ and $\sup$ operators
-- No unambiguous $\inf$/$\sup$ for pixel/vector:
+- No unambiguous $\inf$ / $\sup$ for pixel/vector:
     $$\begin{bmatrix}1\\5\\2\end{bmatrix} \overset{?}{\lessgtr} \begin{bmatrix}0\\6\\1\end{bmatrix}$$
 - Marginal ordering $\Rightarrow$ by band filtering
 - Reduced ordering $\Rightarrow h:\mathbb{R}^d\to\mathbb{R}$
   $$\mathbf{x}\mapsto h(x)$$
 - Use spectral feature extraction /then/ spatial feature extraction.
+
+** Questions
+*** Noise filtering
+- The image has been corrupted by a /salt and pepper/ noise, which filter should we use to filter it ?
+
+  =a) mean filter, b) opening, c) median filter and d) closing=.
+- To remove the small cars on the road, which filter should we use to filter it ?
+
+  =a) mean filter, b) opening, c) median filter and d) closing=.
+
+**** Original                                                      :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 7cm 2cm 7cm, clip=true]
+[[file:./figures/university_pc1.png]]
+
+**** Noise                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 7cm 2cm 7cm, clip=true]
+[[file:./figures/university_noise.png]]
+
+**** Median                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+LaTeX: \only<2->{
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 7cm 2cm 7cm, clip=true]
+[[file:./figures/university_noise_filtered.png]]
+#+LaTeX: }
+
+**** Opening by reconstruction                                     :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.22
+:END:
+#+LaTeX: \only<3>{
+#+ATTR_LATEX: :width 1\linewidth :center :options [trim=2cm 7cm 2cm 7cm, clip=true]
+[[file:./figures/university_open_2.png]]
+#+LaTeX: }
+
+* References                                                         :export:
+*** Bibliography
+  :PROPERTIES:
+  :BEAMER_OPT: fragile,allowframebreaks,label=
+  :END:      
+  \printbibliography
+*** 
+#+BEGIN_CENTER
+\tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
+\normalsize
+
+#+ATTR_LATEX: :width 0.1\textwidth
+[[file:figures/cc-by-sa.png]]
+#+END_CENTER
 * Figures                                                          :noexport:
 ** PCA
 #+BEGIN_SRC python :session :results output
@@ -1386,3 +1588,33 @@ print clf.intercept_
 : [-0.08378251]
 
 ** FFFS
+
+** Noise in figure
+#+BEGIN_SRC python 
+import rasterTools as rt
+import scipy as sp
+
+# Load image
+im,Geo,Proj=rt.open_data("../Data/pca_university.tif")
+[H,W,B]=im.shape
+
+# Add noise
+im = im[:,:,0].reshape(H,W)
+M,m = im.max(),im.min()
+
+prob = 0.2
+rnd = sp.random.rand(H, W)
+noisyImage = im.copy()
+noisyImage[rnd<prob]=m
+noisyImage[rnd>1-prob]=M
+
+rt.write_data("../Data/university_noise.tif",noisyImage,Geo,Proj)
+#+END_SRC
+
+
+
+* Todo                                                             :noexport:
+- [X] Add questions for stastistical feature extraction
+- [X] Add questions for spatial feature extraction
+- [ ] Add simulations for stastitical feature extraction
+- [ ] Add some references

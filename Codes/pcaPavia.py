@@ -13,14 +13,14 @@ wave = sp.loadtxt('../Data/waves.csv',delimiter=',')
 pca = PCA()
 pca.fit(im)
 
-# Plot explained variance
-l = pca.explained_variance_ratio_
-print l[:5]
-print (l.cumsum()/l.sum())[:5]
-
 # Save Eigenvectors
 D = sp.concatenate((wave[:,sp.newaxis],pca.components_[:3,:].T),axis=1)
 sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
+
+# Plot explained variance
+l = pca.explained_variance_
+print l[:5]
+print (l.cumsum()/l.sum())[:5]
 
 # Projection of the first PCs
 imp = sp.dot(im,pca.components_[:3,:].T)

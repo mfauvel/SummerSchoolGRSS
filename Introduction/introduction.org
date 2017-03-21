@@ -26,7 +26,7 @@
 #+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
 #+LATEX_HEADER: \addbibresource{intro.bib}
 #+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
-
+#+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=magenta}
 
 # Color definition
 #+LATEX_HEADER:\definecolor{c1}{rgb}{0,0,0.562}
@@ -737,9 +737,14 @@ What is the number of parameters to estimate for a Gaussian distribution
   :BEAMER_OPT: fragile,allowframebreaks,label=
   :END:      
   \printbibliography
-  
+*** 
+#+BEGIN_CENTER
+\tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
+\normalsize
 
-
+#+ATTR_LATEX: :width 0.1\textwidth
+[[file:figures/cc-by-sa.png]]
+#+END_CENTER
 * Draft                                                            :noexport:
 1. Introduction
    1. Remote sensing
