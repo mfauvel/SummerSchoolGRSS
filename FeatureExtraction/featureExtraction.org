@@ -1092,6 +1092,18 @@ plt.show()
 \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist}
 \end{tabular}}
 #+END_EXPORT
+*** More on this topics
+#+BEGIN_CENTER
+*Image analysis of hyperspectral data using mathematical morphology*
+#+END_CENTER
+
+_Tutorial WHISPERS 2014_: Lesson, Labwork and full matlab implementation !
+
+#+BEGIN_VERSE
+Dalla Mura, Mauro, & Fauvel, Mathieu. (2014, June). 
+Image analysis of hyperspectral data using mathematical morphology. 
+Zenodo. http://doi.org/10.5281/zenodo.437195
+#+END_VERSE
 
 ** Spatial filters
 *** Spatial neighborhood
