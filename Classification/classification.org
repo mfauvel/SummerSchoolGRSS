@@ -1,0 +1,1046 @@
+#+TITLE: Classification of Hyperspectral Images
+#+SUBTITLE: GRSS Summer School
+#+AUTHOR: Mathieu Fauvel
+#+EMAIL: mathieu.fauvel@ensat.fr
+#+DATE: [2017-04-26 Wed 13:30-16:30]
+
+#+INCLUDE_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+LANGUAGE: en
+#+OPTIONS: H:3 toc:t tags:nil properties:nil
+
+#+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM
+
+#+LaTeX_CLASS_OPTIONS: [10pt,aspectratio=1610]
+
+#+BEAMER_THEME: DarkConsole
+#+BEAMER_HEADER: \institute{UMR Dynafor}
+#+BEAMER_HEADER: \AtBeginSection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsection]\end{frame}}
+#+BEAMER_HEADER: \AtBeginSubsection[]{\begin{frame}<beamer>\frametitle{Outline}\tableofcontents[currentsubsection]\end{frame}}
+#+BEAMER_HEADER: \setbeamercovered{again covered={\opaqueness<1->{25}}}
+#+BEAMER_HEADER: \usefonttheme[onlymath]{serif}
+
+#+LATEX_HEADER: \usepackage[english]{babel}\usepackage{etex}\usepackage{minted}\usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{tikz}\usepackage{amsmath}\usepackage[T1]{fontenc}\usepackage{lmodern}%\usepackage{arev}
+#+LATEX_HEADER: \usepackage{booktabs}\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
+#+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
+#+LATEX_HEADER: \addbibresource{class.bib}
+#+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
+#+LATEX_HEADER: \pgfplotsset{compat=newest}
+
+#+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=magenta}
+  
+* Motivations                                                        :export:
+*** Classification of hyperspectral image is a challenging problem
+- Remember /Introduction/: *High dimensional data*
+  + High number of features
+  + Large volume of pixels
+  + Low number of labelled pixels
+- Practical issues:
+  - Intra-class spectral variability
+  - Non-linear pre-processing (atmospheric/geometric corrections)
+  - Noise in the data
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.5 \linewidth
+[[file:./figures/hyper.png]]
+#+END_CENTER
+*** Classification overview
+**** Liste                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Reference data ?
+  + Supervised
+  + Unsupervised
+  + Semi-supervised
+- $p(\mathbf{x},y)\sim\ ?$:
+  + Parametric models
+  + Non parameterics models
+- Number of classes ?
+  - Multiclass
+  - One-class / detection
+  - Unknown
+**** Image                                                         :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.55\textwidth
+[[file:./figures/uni.png]]
+*** Data sets used
+**** Orginal                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.55\textwidth
+[[file:./figures/university_color.png]]
+**** GT                                                            :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.55\textwidth
+[[file:./figures/university_gt.png]]
+* Introductory examples                                              :export:
+** Influence of the number of samples
+*** Experimental set-up
+#+BEGIN_SRC python :tangle ../Codes/script_sample_size.py :exports code
+import scipy as sp
+import rasterTools as rt
+from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.metrics import f1_score
+
+# Load data set
+X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+
+# Split the data
+X_, X_test, y_, y_test = train_test_split(X, y, train_size=0.50,random_state=0,stratify=y)
+
+# Try differents size of the training set
+SPLIT = sp.linspace(0.01,0.99,15)
+F1,NS = sp.zeros_like(SPLIT),sp.zeros_like(SPLIT)
+for i,split in enumerate(SPLIT):
+    # Split the data
+    X_train, _, y_train, _ = train_test_split(X_, y_, train_size=split,random_state=0,stratify=y_)
+    # Learn the classifier
+    clf = QuadraticDiscriminantAnalysis()
+    clf.fit(X_train,y_train)
+    # Predict the classes
+    yp = clf.predict(X_test)
+    #Compute the F1
+    F1[i],NS[i] = f1_score(y_test,yp,average='weighted'),y_train.size
+#+END_SRC
+
+#+BEGIN_SRC python :tangle ../Codes/script_sample_size.py :exports none
+D = sp.concatenate((NS[:,sp.newaxis],F1[:,sp.newaxis]),axis=1)
+sp.savetxt("../Classification/figures/data_samples_size.csv",D,delimiter=',')
+#+END_SRC
+*** Results
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+  \begin{semilogxaxis}[width=0.7\textwidth,height=0.3\textwidth,xlabel=Number of samples,ylabel=F1,grid=both,xmin=0,ymax=1]
+  \addplot[blue,mark=*] table[x index=0,y index=1,col sep=comma] {figures/data_samples_size.csv};
+    \end{semilogxaxis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+- Dimension of the data: $d=103$
+- Number of parameters to estimate: 49139
+** Influence of the number of features
+*** Experimental set-up
+#+BEGIN_SRC python :tangle ../Codes/script_feature_size.py :exports code
+import scipy as sp
+import rasterTools as rt
+from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.metrics import f1_score
+
+# Load data set
+X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+
+# Split the data
+X_, X_test, y_train, y_test = train_test_split(X, y, train_size=0.25,random_state=0,stratify=y)
+
+# Try differents size of the training set
+SKIP = sorted(range(1,11),reverse=True)
+FS,NF = sp.zeros_like(SKIP,dtype='float'),sp.zeros_like(SKIP)
+for i,skip in enumerate(SKIP):
+    # Skip some variables
+    X_train =X_[:,::skip]
+    # Learn the classifier
+    clf = QuadraticDiscriminantAnalysis()
+    clf.fit(X_train,y_train)
+    # Predict the classes
+    yp = clf.predict(X_test[:,::skip])
+    #Compute the FS
+    FS[i], NF[i] = f1_score(y_test,yp,average='weighted'), X_train.shape[1]
+#+END_SRC
+
+#+BEGIN_SRC python :tangle ../Codes/script_feature_size.py :exports none
+D = sp.concatenate((NF[:,sp.newaxis],FS[:,sp.newaxis]),axis=1)
+sp.savetxt("../Classification/figures/data_features_size.csv",D,delimiter=',')
+#+END_SRC
+*** Results
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+  \begin{axis}[width=0.7\textwidth,height=0.3\textwidth,xlabel=Number of features,ylabel=F1,grid=both,xmin=0,ymax=1]
+  \addplot[blue,mark=*] table[x index=0,y index=1,col sep=comma] {figures/data_features_size.csv};
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+** Comparison of state of the art classifier
+*** Experimental set-up 
+#+BEGIN_SRC python :tangle ../Codes/script_classifier.py :exports none
+import scipy as sp
+import rasterTools as rt
+import npfs as npfs
+import time
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import neighbors
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.metrics import f1_score
+from sklearn.preprocessing import StandardScaler
+
+# Convenient fuctions
+def compute_SVM(x,y,xt,yt,param_grid_svm):    
+    y.shape=(y.size,)    
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(x,y)
+    grid = GridSearchCV(SVC(), param_grid=param_grid_svm, cv=cv,n_jobs=-1)
+    grid.fit(x, y)
+    clf = grid.best_estimator_
+    clf.fit(x,y)
+    yp = clf.predict(xt).reshape(yt.shape)
+    return f1_score(yt,yp,average='weighted')
+
+def compute_Linear_SVM(x,y,xt,yt,param_grid_svm):    
+    y.shape=(y.size,)    
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(x,y)
+    grid = GridSearchCV(SVC(kernel='linear'), param_grid=param_grid_svm, cv=cv,n_jobs=-1)
+    grid.fit(x, y)
+    clf = grid.best_estimator_
+    clf.fit(x,y)
+    yp = clf.predict(xt).reshape(yt.shape)
+    return f1_score(yt,yp,average='weighted')
+
+def compute_RF(x,y,xt,yt,param_grid_rf):
+    y.shape=(y.size,)    
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(x,y)
+    grid = GridSearchCV(RandomForestClassifier(), param_grid=param_grid_rf, cv=cv,n_jobs=-1)
+    grid.fit(x, y)
+    clf = grid.best_estimator_
+    clf.fit(x,y)
+    yp = clf.predict(xt).reshape(yt.shape)
+    return f1_score(yt,yp,average='weighted')
+
+def compute_FFFS(x,y,xt,yt,param_grid_fffs):
+    maxVar = param_grid_fffs['maxvar']
+    clf = npfs.GMMFeaturesSelection()
+    clf.learn_gmm(x,y)
+    idx, crit, [] = clf.selection('forward',x, y, criterion='F1Mean', varNb=maxVar, nfold=5)
+    d_crit = sp.diff(crit)/crit[:-1]
+    nv = sp.where(d_crit<param_grid_fffs['threshold'])[0][0]
+    print("Number of variables {}".format(nv))
+    yp = clf.predict_gmm(xt,featIdx=idx[:nv])[0]
+    return f1_score(yt,yp,average='weighted')
+
+def compute_KNN(x,y,xt,yt,param_grid_knn):
+    y.shape=(y.size,)    
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(x,y)
+    grid = GridSearchCV(neighbors.KNeighborsClassifier(), param_grid=param_grid_knn, cv=cv,n_jobs=-1)
+    grid.fit(x, y)
+    clf = grid.best_estimator_
+    clf.fit(x,y)
+    yp = clf.predict(xt).reshape(yt.shape)
+    return f1_score(yt,yp,average='weighted')
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_classifier.py :exports code
+if __name__ == '__main__':
+    # Load data set
+    X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+    sc = StandardScaler()
+    X = sc.fit_transform(X)
+
+    # Split the data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.1,random_state=0,stratify=y)
+
+    # Parameters
+    param_grid_svm = dict(gamma=2.0**sp.arange(-4,4), C=10.0**sp.arange(0,3)) # SVM
+    param_grid_linear_svm = dict(C=10.0**sp.arange(-2,3)) # LinearSVM
+    param_grid_rf = dict(n_estimators=sp.arange(10,150,10)) # RF
+    param_grid_fffs = dict(maxvar=20,threshold=0.001) # FFFS
+    param_grid_knn = dict(n_neighbors = sp.arange(1,50,5))
+    F1,CT=[],[]
+
+    # Start the classification: SVM
+    ts=time.time()
+    F1.append(compute_SVM(X_train,y_train,X_test,y_test,param_grid_svm))
+    CT.append(time.time()-ts)
+
+    # Start the classification: RF
+    ts=time.time()
+    F1.append(compute_RF(X_train,y_train,X_test,y_test,param_grid_rf))
+    CT.append(time.time()-ts)
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_classifier.py :exports none
+    # Start the classification: LinearSVM
+    ts=time.time()
+    F1.append(compute_Linear_SVM(X_train,y_train,X_test,y_test,param_grid_linear_svm))
+    CT.append(time.time()-ts)
+
+    # Start the classification: FFFS
+    ts=time.time()
+    F1.append(compute_FFFS(X_train,y_train,X_test,y_test,param_grid_fffs))
+    CT.append(time.time()-ts)
+
+    # Start the classification: KNN
+    ts=time.time()
+    F1.append(compute_KNN(X_train,y_train,X_test,y_test,param_grid_knn))
+    CT.append(time.time()-ts)
+    
+    # Print results
+    print F1
+    print CT
+    for c in sp.unique(y_train):
+        t = sp.where(y_train==c)[0]
+        print("Number of training samples for class {0}:{1}".format(c,t.size))
+    for c in sp.unique(y_train):
+        t = sp.where(y_test==c)[0]
+        print("Number of testing samples for class {0}:{1}".format(c,t.size))
+#+END_SRC
+*** Results
+**** Number of samples                                             :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+  #+ATTR_LATEX: :booktabs t
+  | Class | $\bullet$ | $\blacksquare$ |
+  |-------+-----------+----------------|
+  |     1 |       663 |           1326 |
+  |     2 |      1865 |           3730 |
+  |     3 |       210 |            420 |
+  |     4 |       306 |            613 |
+  |     5 |       134 |            269 |
+  |     6 |       503 |           1006 |
+  |     7 |       133 |            266 |
+  |     8 |       368 |            736 |
+  |     9 |        95 |            189 |
+  |-------+-----------+----------------|
+
+**** Classification VS time                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.7
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+  \begin{semilogxaxis}[width=0.9\textwidth,xlabel=Processing time (s),ylabel=F1,grid=both,xmin=0,ymax=1,legend pos = north west]
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,blue,mark=*] coordinates {(250,0.94)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,red,mark=*] coordinates {(64,0.89)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,orange,mark=*] coordinates {(43,0.90)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,gray,mark=*] coordinates {(23,0.91)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,black,mark=*] coordinates {(25,0.84)};
+  \legend{SVM,RF,Lin. SVM,FFFS,KNN};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,blue,mark=square*] coordinates {(1030,0.95)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,red,mark=square*] coordinates {(125,0.91)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,orange,mark=square*] coordinates {(140,0.91)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,gray,mark=square*] coordinates {(49,0.93)};
+  \addplot[mark size=2pt,legend image post style={sharp plot, line width=3pt, mark=none},only marks,black,mark=square*] coordinates {(71,0.86)};
+  \end{semilogxaxis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Classification Map
+#+BEGIN_SRC python :tangle ../Codes/script_classifier.py :exports none
+    # Load data
+    im,GeoT,Proj = rt.open_data('../Data/university.tif')
+    [h,w,b]=im.shape
+    im.shape=(h*w,b)
+    im = sc.transform(im)
+    
+    # Perform the classification of the whole image
+    y_train.shape=(y_train.size,)    
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(X_train,y_train)
+    grid = GridSearchCV(SVC(), param_grid=param_grid_svm, cv=cv,n_jobs=-1)
+    grid.fit(X_train, y_train)
+    clf = grid.best_estimator_
+    clf.fit(X_train,y_train)
+
+    imp = clf.predict(im).reshape(h,w)
+    
+    # Save image
+    rt.write_data('../Data/tm_university_svm.tif',imp,GeoT,Proj)
+#+END_SRC
+**** Original                                                      :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.55\textwidth
+[[file:./figures/university_color.png]]
+**** Thematic map                                                  :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.55\textwidth
+[[file:./figures/university_tm_svm.png]]
+
+** Comparison spectral feature extraction
+*** PCA, LDA and KPCA
+#+BEGIN_SRC python :tangle ../Codes/script_classifier_fe.py :exports none
+import scipy as sp
+import rasterTools as rt
+from sklearn import neighbors
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.metrics import f1_score
+#+END_SRC
+
+#+BEGIN_SRC python :tangle ../Codes/script_classifier_fe.py :exports code
+DATA = ['../Data/university.tif','../Data/pca_university.tif','../Data/lda_university.tif',
+        '../Data/kpca_university.tif']
+GT = '../Data/university_gt.tif'
+
+F1_knn,F1_gmm = [],[]
+for data in DATA:
+    print data
+    # Load data set
+    X,y=rt.get_samples_from_roi(data,GT)
+    sc = StandardScaler()
+    X = sc.fit_transform(X)
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_classifier_fe.py :exports none    
+    # Split the data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.1,random_state=0,stratify=y)
+
+    # Compute Cross validation for knn
+    y_train.shape=(y_train.size,)
+    cv = StratifiedKFold(n_splits=5,random_state=0).split(X_train,y_train)
+    grid = GridSearchCV(neighbors.KNeighborsClassifier(), param_grid=dict(n_neighbors = sp.arange(1,50,5)), cv=cv,n_jobs=-1)
+    grid.fit(X_train, y_train)
+
+    # Compute classification for knn
+    clf = grid.best_estimator_
+    clf.fit(X_train,y_train)
+    yp = clf.predict(X_test).reshape(y_test.shape)
+    F1_knn.append(f1_score(y_test,yp,average='weighted'))
+
+    # Compute classification for GMM
+    clf = QuadraticDiscriminantAnalysis()
+    clf.fit(X_train,y_train)
+    yp = clf.predict(X_test)
+    F1_gmm.append(f1_score(y_test,yp,average='weighted'))
+    
+    # Clean data
+    X,X_train,X_test,y,y_train,y_test=[],[],[],[],[],[]
+
+print F1_knn
+print F1_gmm
+#+END_SRC
+
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[ybar,small,enlargelimits=0.15, legend style={at={(1.1,0.5)},anchor=north},
+      ylabel={F1},
+      symbolic x coords={Full,PCA,LDA,KPCA},
+      xtick=data, width=0.7\textwidth,height=0.35\textwidth,grid]
+      \addplot coordinates {(Full,0.84) (PCA,0.81) (LDA,0.80) (KPCA,0.76)};
+      \addplot coordinates {(Full,0.76) (PCA,0.78) (LDA,0.78) (KPCA,0.72)};
+      \legend{K-NN,GMM}
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+* Spatial-spectral Classification                                    :export:
+** Introduction
+*** Overview of spatial-spectral methods
+**** Spatial inter-pixel dependency                        :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: block
+:END:
+- Spatial feature extraction
+  + Texture
+  + Mathematical morphology
+  + Convolution
+- Image Segmentation
+  + kmeans
+  + MeanShift
+- Markov Random Field
+
+#+LaTeX: \vspace{0.45cm}
+
+**** Joint use of spectral and spatial information         :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: block
+:BEAMER_act: <only@2>
+:END:
+- Data fusion
+  + Input: Feature stacking,
+  + Output: fusion of classifier outputs.
+- Post classification regularization
+  + Majority vote,
+  + Region growing from markers.
+- Spatial-spectral classifiers:
+  + Composite kernel
+  + MRF
+*** Question to solve
+1. What kind of information is needed ?
+2. How to extract it from the data ?
+3. How to combine it with the spectral information ?
+** Spatial filter 
+*** Texture information
+- Template filters
+  + Mean, variance, median, entropy, range, ...
+- Gabor features
+- Wavelet features cite:1026708
+- Co-occurrence  cite:4309314 
+
+#+BEGIN_SRC bash :exports code
+otbcli_HaralickTextureExtraction -in ../Data/pca_university.tif -channel 1 \
+				 -out ../Data/university_haralick.tif -parameters.min 789 parameters.max 64897
+#+END_SRC
+
+**** Color Image                                           :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth :center :options [trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true]
+[[file:./figures/university_color.png]]
+**** Energy for PC1                                        :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth :center :options [trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true]
+[[file:./figures/university_H1.png]]
+**** Correlation for PC1                                   :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth :center :options [trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true]
+[[file:./figures/university_H8.png]]
+*** Morphological neighborhood
+#+ATTR_LATEX: :width 0.25\textwidth :options [trim = 0mm 0mm 0mm 40mm,clip]
+[[file:./figures/neighbors_1.pdf]]
+
+**** Morphological neighborhood                             :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+The Morphological Neighborhood  of a pixel $\mathbf{x}$ is  the set of
+pixels that belongs to the same spatial structure than $\mathbf{x}$.
+
+**** Comparison with some neighborhood systems                 :B_example:
+:PROPERTIES:
+:BEAMER_env: example
+:END:
+#+BEGIN_EXPORT latex
+\centerline{\begin{tabular}{cccc}
+    \pgfimage[width=0.30\textwidth]{figures/mrf} & \pgfimage[width=0.15\textwidth]{figures/composite} & \pgfimage[width=0.15\textwidth]{figures/texture}& \pgfimage[width=0.15\textwidth]{figures/morpho}\\ 
+MRF & 8-connectivity & 4-connectivity& MN
+\end{tabular}
+}
+#+END_EXPORT
+
+*** Morphological profile
+**** Morphological profile                                  :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+The Morphological  Profile of  size $n$ is  a \((2n+1)\)-dimensional
+vector such as:\vspace{-0.25cm}
+$$\text{MP}(\mathbf{x})=\Big[\text{CP}_n(\mathbf{x}),f(\mathbf{x}),\text{OP}_n(\mathbf{x})\Big].$$
+**** Image                                                       :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{tikzpicture}
+  \draw (0,0) node  {\includegraphics[width=0.9\linewidth]{figures/mp_0.pdf}};
+  \draw (0,-1.25) node  {$\mathbf{x}$};
+  \draw[->,thick] (0.125,-1.25) -- (0.45\linewidth,-1.25); 
+  \draw[->,thick] (-0.125,-1.25) -- (-0.45\linewidth,-1.25);
+  \draw[] (0.4\linewidth,-1.5) node {OP($\mathbf{x}$)}; 
+  \draw[] (-0.4\linewidth,-1.5) node {CP($\mathbf{x}$)}; 
+\end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+For a given pixel $\mathbf{x}$, information include in the MP($\mathbf{x}$) are:
+- <2>  _Contrast_: Is  the structure to which the pixel  belongs to  darker or  lighter than his surrounding neighbors?
+- <2> _Size_:  Is the structure to which the  pixel belongs to  small or big compared to $G$?
+*** Derivative of the MP
+**** Derivative of the morphological profile                :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+The  Derivative  of  the  Morphological  Profile  of  size  $n$  is  a \((2n)\)-dimensional vector such as:\vspace{-0.25cm}
+
+$$\text{DMP}(\mathbf{x})=\Big[|\phi_n(\mathbf{x})-\phi_{n-1}(\mathbf{x})|,\ldots,|\gamma_{n-1}(\mathbf{x})-\gamma_n(\mathbf{x})|\Big].$$
+**** Image                                               :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+
+#+ATTR_LATEX: :width 0.9\textwidth :height 0.15\textwidth
+[[file:./figures/mp_0.pdf]]
+
+#+ATTR_LATEX: :width 0.75\textwidth :height 0.15\textwidth
+[[file:./figures/DMP_im.pdf]]
+*** Limits of the (D)MP
+- Geodesics filters only act on extrema structures
+- <4> Self-complementary area filter
+
+
+#+BEGIN_EXPORT latex
+  \only<1>{\centerline{\includegraphics[width=0.60\textwidth]{figures/orig_g}}}
+  \only<2>{\centerline{\includegraphics[width=0.60\textwidth]{figures/open_g}}}
+  \only<3>{\centerline{\includegraphics[width=0.60\textwidth]{figures/close_g}}}
+  \only<4>{\centerline{\includegraphics[width=0.60\textwidth]{figures/area_g}}}
+#+END_EXPORT
+*** Self-complementary area filter
+- Self-complementarity: $\Psi = \mathbf{C}\Psi\Rightarrow$ each structure is processed equally.
+- Area filter: Removes small structures (area = number of pixels).
+- Algorithm:
+  1. Label all the flat zones that satisfy the area criterion $\lambda$,
+  2. Grow  the labelled flat  zones until a partition  of the image is reached.
+
+#+BEGIN_EXPORT latex
+\centerline{
+\begin{tabular}{c@{~}c@{~}c@{~}c}
+\includegraphics[width=0.23\textwidth,height=0.23\textwidth]{figures/orig.pdf} & \includegraphics[width=0.23\textwidth,height=0.23\textwidth]{figures/image_filtree_10}& \includegraphics[width=0.23\textwidth,height=0.23\textwidth]{figures/image_filtree_30}& \includegraphics[width=0.23\textwidth,height=0.23\textwidth]{figures/image_filtree_40}\\
+Original & $\lambda =10$ & $\lambda =30$ & $\lambda =40$
+\end{tabular}}
+#+END_EXPORT
+*** MN based on area filtering
+- Extract the inter-pixel dependency $\Upsilon$:
+  
+  #+BEGIN_EXPORT latex
+  \centerline{
+      \begin{tabular}{c@{~}c@{~}c}
+        \includegraphics[width=0.25\textwidth]{figures/neighbors_1}&\includegraphics[width=0.25\textwidth]{figures/neighbors_2}&\includegraphics[width=0.25\textwidth]{figures/neighbors_3}\\
+        \color{red}$\mathbf{x}$& $\lambda=30$ & \color{red}$\Omega_\mathbf{x}$
+      \end{tabular}
+    }
+  #+END_EXPORT
+- $\Upsilon_\mathbf{x}=\text{median}(\Omega_\mathbf{x})$:
+  + Structure: What are the pixels related to $\mathbf{x}$?
+  + Contrast: Local gray-level distribution
+*** Extended Morphological Profile
+**** Extended Morphological Profile :B_definition:
+:PROPERTIES:
+:BEAMER_env: definition
+:END:
+The EMP of  size $n\times p$ is a  \((2n+1)p\)-dimensional vector made
+of   the  MP   build  with   the  $p$   first  principal   components:
+$$\text{EMP}(\mathbf{x})=\Big[\text{MP}_1(\mathbf{x}),\ldots,\text{MP}_p(\mathbf{x})\Big].$$
+**** EMP                                                 :B_ignoreheading:
+:PROPERTIES:
+:BEAMER_env: ignoreheading
+:END:
+#+BEGIN_EXPORT latex
+ \centerline{\resizebox{0.95\textwidth}{!}{\input{figures/emp.pdf_t}}}
+#+END_EXPORT
+
+- Fusion of morphological and spectral features
+- PCA, FDA, Kernel-PCA ...
+- /Same methods for self-complementary area filter/
+
+*** Application case: Extended Morphological Profile
+#+BEGIN_SRC python :tangle ../Codes/script_emp.py :exports none
+import scipy as sp
+from skimage.morphology import disk, erosion, dilation, reconstruction
+import rasterTools as rt
+
+def morphological_profile(im,radius=1,step=2,no=4):
+    """ Compute the morphological profile of a given flat image with a disk as structuring element
+    INPUT:
+    im: input image, must be flat
+    radius: initial size of SE
+    step: step size for the SE
+    no: number of opening/closing
+    OUTPUT:
+    MP: morphological profile, image of size h*w*(2*no+1)
+    """
+    if im.ndim != 2:
+        print("Image should be flat")
+        exit()
+
+    # Initialization of the output
+    [h,w] = im.shape
+    out = sp.empty((h,w,2*no+1))
+    out[:,:,no]=im.copy()
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_emp.py :exports code
+    # Start the computation
+    for i in xrange(no):
+        # Structuring elements
+        se = disk(radius+i*2)
+
+        # Compute opening per reconstruction
+        temp = erosion(im,se)
+        out[:,:,no+1+i] = reconstruction(temp,im,method='dilation')
+
+        # Compute closing per reconstruction
+        temp = dilation(im,se)
+        out[:,:,no-1-i] = reconstruction(temp,im,method='erosion')
+
+    return out
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_emp.py :exports code
+if __name__ == '__main__':
+    # Load image
+    im,GeoT,Proj = rt.open_data('../Data/pca_university.tif')
+
+    # Apply the Morphological profile on each PC
+    EMP = []
+    for i in xrange(3):
+        EMP.append(morphological_profile(im[:,:,i]))
+    EMP = sp.concatenate(EMP,axis=2)
+    rt.write_data("../Data/emp_pca_university.tif",EMP,GeoT,Proj)
+#+END_SRC
+*** Questions 1/2
+**** Data                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\textwidth
+[[file:./figures/emp_question.png]]
+
+**** Question :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[grid,xmin=-4,xmax=4,small,cycle list name=linestyles,title=Morphological Profile,xlabel=CP - $\mathbf{x}$ - OP]
+      \addplot+[mark=*,thick] coordinates {(-4,41772) (-3,41772) (-2,41772) (-1,41772) (0,41772) (1,41772) (2,41772) (3,24257) (4,23449)} ;      
+      \addplot+[mark=*,thick] coordinates {(-4,10876) (-3,9277) (-2,8430) (-1,8430) (0,8430) (1,8430) (2,8430) (3,8430) (4,8430)} ;
+      \addplot+[mark=*,thick] coordinates {(-4,10276) (-3,10276) (-2,10276) (-1,10276) (0,10026) (1,10026) (2,10026) (3,9991) (4,9608)} ;  
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
+*** Questions 2/2
+Where is the /closing/ and the /opening/ ?
+**** Data                                                          :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:./figures/emp_question.png]]
+
+**** Opening                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:./figures/university_opening.png]]
+
+**** Closing                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:END:
+#+ATTR_LATEX: :width 0.8\textwidth
+[[file:./figures/university_closing.png]]
+
+** Data fusion
+*** Feature fusion 1/2
+#+BEGIN_EXPORT latex
+\begin{center}
+  \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
+  \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=4em]
+  \tikzstyle{line} = [draw, -latex']
+  \begin{tikzpicture}
+    \draw (0,2) node[data] (F1) {Feature 1};
+    \draw (0,1) node[data] (F2) {Feature 2};
+    \draw (0,0) node[] {$\vdots$};
+    \draw (0,-1) node[data] (Fk) {Feature k};
+    \draw (0,-2) node[data] (FK) {Feature K};
+    \draw (4,0) node[block] (stack) {Stacking};
+    \draw (8,0) node[block] (class) {Classifier};
+    \path [line] (F1) -- (stack);
+    \path [line] (F2) -- (stack);
+    \path [line] (Fk) -- (stack);
+    \path [line] (FK) -- (stack);
+    \path [line] (stack) -- (class);
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Feature fusion 2/2
+**** Method                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Extract several spatial descriptors
+  + EMP,
+  + Texture,
+  + Histogram of oriented gradients (HOG),
+  + ...
+- /Optional/: apply feature extraction 
+  + Spectral features,
+  + Spatial features,
+  + Both
+- Stack all the features into a "big vector"
+
+**** Results                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- In cite:fauvel2008spectral:
+  + Extrat EMP
+  + Apply PCA/LDA to the spectral and spatial features
+  + Stack the first PCs of spectral/spatial feautres
+  + Classification with SVM
+#+ATTR_LATEX: :booktabs t
+| Method          | # Features |   OA |
+|-----------------+------------+------|
+| Spectral        |        103 | 79.5 |
+| EMP             |         27 | 79.1 |
+| S+EMP           |        130 | 83.5 |
+| S-DBFE+EMP-DBFE |      27+10 | 88.0 |
+*** Classifier fusion 1/2
+#+BEGIN_EXPORT latex
+\begin{center}
+  \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
+  \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=2em]
+  \tikzstyle{line} = [draw, -latex']
+  \begin{tikzpicture}
+    \draw (0,2) node[data] (F1) {Feature 1};
+    \draw (0,1) node[data] (F2) {Feature 2};
+    \draw (0,0) node[] {$\vdots$};
+    \draw (0,-1) node[data] (Fk) {Feature k};
+    \draw (0,-2) node[data] (FK) {Feature K};
+    \draw (4,2) node[block] (class1) {Classifier 1};
+    \draw (4,1) node[block] (class2) {Classifier 2};
+    \draw (4,-1) node[block] (classk) {Classifier k};
+    \draw (4,-2) node[block] (classK) {Classifier K};
+    \draw (8,0) node[block] (fusion) {Fusion};
+    \path [line] (F1) -- (class1);
+    \path [line] (F2) -- (class2);
+    \path [line] (Fk) -- (classk);
+    \path [line] (FK) -- (classK);
+    \path [line] (class1) -- (fusion);
+    \path [line] (class2) -- (fusion);
+    \path [line] (classk) -- (fusion);
+    \path [line] (classK) -- (fusion);
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+*** Classifier fusion 2/2
+**** Method                                                        :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+- Fusion of classifier outputs:
+  + At the decision level
+    $$ C_1:\{y_1\};$$
+    $$C_2:\{y_2\};$$
+    $$\vdots$$
+    $$C_K:\{y_K\}$$
+  + At the membership level
+    $$ C_1:\{m_{11},\ldots,m_{1C}\};$$
+    $$C_2:\{m_{21},\ldots,m_{2C}\};$$
+    $$\vdots$$
+    $$C_K:\{m_{K1},\ldots,m_{KC}\}$$
+- Decision level: Majority vote
+- Membership level: Probabilistics methods, fuzzy logic, Dempster-Shafer ...
+
+**** Results                                                       :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_act: <only@2>
+:END:
+- In cite:Fauvel06acombined: Fusion of SVM
+- Use the distance to the hyperplane
+- /Absolute maximum/ fusion rule
+- Two classifiers with different intputs: Spectral and EMP
+#+ATTR_LATEX: :booktabs t
+| Feature       |   OA |
+|---------------+------|
+| Spectral      | 81.0 |
+| EMP           | 85.2 |
+|---------------+------|
+| Output fusion | 89.6 |
+
+*** Data fusion in action
+- Simple to implement:
+  #+BEGIN_SRC python :tangle ../Codes/script_fusion.py :exports none
+import rasterTools as rt
+import scipy as sp
+from sklearn.decomposition import KernelPCA, PCA
+from sklearn.preprocessing import StandardScaler
+from script_emp import morphological_profile
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score
+
+# Load data set
+im,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=im.shape
+im.shape=(h*w,b)
+
+# Compute the morphological profile
+pca = PCA(n_components=3)
+pcs = pca.fit_transform(im)
+EMP = []
+for i in xrange(3):
+    EMP.append(morphological_profile(pcs[:,i].reshape(h,w),step=1,no=10))
+EMP = sp.concatenate(EMP,axis=2)
+EMP.shape=(h*w,EMP.shape[2])
+del pcs
+#+END_SRC
+  #+BEGIN_SRC python :tangle ../Codes/script_fusion.py :exports code
+# Concatenate the spectral and spatial features and do scaling
+IM_EMP = sp.concatenate((im,EMP),axis=1)
+sc = StandardScaler()
+IM_EMP = sc.fit_transform(IM_EMP)
+#+END_SRC
+  #+BEGIN_SRC python :tangle ../Codes/script_fusion.py :exports none
+del im,EMP
+
+# Save the results
+rt.write_data("../Data/fusion_inputs_university.tif",IM_EMP.reshape(h,w,IM_EMP.shape[1]),GeoT,Proj)
+
+# Get the training set
+X,y=rt.get_samples_from_roi('../Data/fusion_inputs_university.tif','../Data/university_gt.tif')
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.1,random_state=0,stratify=y)
+
+y_train.shape=(y_train.size,)    
+cv = StratifiedKFold(n_splits=5,random_state=0).split(X_train,y_train)
+grid = GridSearchCV(SVC(), param_grid=dict(gamma=2.0**sp.arange(-4,4), C=10.0**sp.arange(0,3)), cv=cv,n_jobs=-1)
+grid.fit(X_train, y_train)
+clf = grid.best_estimator_
+clf.fit(X_train,y_train)
+yp = clf.predict(X_test).reshape(y_test.shape)
+print f1_score(y_test,yp,average='weighted')
+
+del X_train, X_test, y_train, y_test
+# Predict the whole image
+imp = clf.predict(IM_EMP)
+rt.write_data('../Data/tm_university_fusion.tif',imp.reshape(h,w),GeoT,Proj)
+#+END_SRC
+- Good classification accuracy: $F1=0.99$
+- sptial
+
+**** Color Image                                           :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width \textwidth :height 0.8\textwidth :center :options [trim=2.cm 1cm 2cm 14.304cm, clip=true]
+[[file:./figures/university_color.png]]
+**** Spectral only                                         :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width \textwidth :height 0.8\textwidth :center :options [trim=2.cm 1cm 2cm 14.304cm, clip=true]
+[[file:./figures/university_tm_svm.png]]
+**** Spectral + EMP                                        :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width \textwidth :height 0.8\textwidth :center :options [trim=2.cm 1cm 2cm 14.304cm, clip=true]
+[[file:./figures/university_tm_fusion.png]]
+** Spatial post-regularization
+*** Segmentation 1/4
+- Main ideas
+  + Segmentation of the image: partition the image into non-overlapping homogeneous zones
+  + Spatial regularization of the thematic map
+- Issues:
+  + Segmentation of hyperspectral images is tricky !
+  + Spatial regularization 
+- From cite:fauvel2013advances:
+  + Segmentation:
+    - Image processing: Watershed, region growing, mean-shift, ...      
+    - Statistical: GMM, K-means ...
+  + Regularization:
+    - Majority voting,
+    - Region growing
+*** Segmentation 2/4
+#+BEGIN_SRC bash :exports codes
+# Using Mean Shift
+otbcli_Segmentation -in ../Data/pca_university.tif -mode raster -mode.raster.out ../Data/mean_shift_university.tif \
+		    -filter.meanshift.minsize 50
+#+END_SRC
+**** Color Image                                           :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width \textwidth :height 0.8\textwidth :center :options [trim=2.cm 1cm 2cm 14.304cm, clip=true]
+[[file:./figures/university_color.png]]
+
+
+**** Segmented                                             :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.4
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width \textwidth :height 0.8\textwidth :center :options [trim=2.cm 1cm 2cm 14.304cm, clip=true]
+[[file:./figures/university_mean_shift.png]]
+
+*** Segmentation 3/4
+#+BEGIN_SRC python :export none :tangle ../Codes/script_fusion_mv.py
+import rasterTools as rt
+import scipy as sp
+from scipy.stats import mode
+
+# Load Thematic Map
+im,GeoT,Proj = rt.open_data('../Data/tm_university_svm.tif')
+out = sp.empty_like(im)
+
+# Load segmented image
+segmented,GeoT,Proj = rt.open_data('../Data/mean_shift_university.tif')
+
+# Do the majority vote
+for l in sp.unique(segmented):
+    t = sp.where(segmented==l)
+    y = im[t]
+    out[t] = mode(y, axis=None)[0][0]
+
+# Write the new image
+rt.write_data("../Data/tm_university_fusion_mv.tif",out,GeoT,Proj)    
+#+END_SRC
+
+*** Segmentation 4/4
+**** Spectral only                                                 :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\textwidth
+[[file:./figures/university_tm_svm.png]]
+
+
+**** Majority vote                                                 :BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:END:
+#+ATTR_LATEX: :width 0.6\textwidth
+[[file:./figures/university_tm_fusion_mv.png]]
+
+
+
+*** Markov Random Field
+** Composite kernel
+* References                                                         :export:
+*** Bibliography
+  :PROPERTIES:
+  :BEAMER_OPT: fragile,allowframebreaks,label=
+  :END:      
+  \printbibliography
+*** 
+#+BEGIN_CENTER
+\tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
+\normalsize
+
+#+ATTR_LATEX: :width 0.1\textwidth
+[[file:figures/cc-by-sa.png]]
+#+END_CENTER
+* Figures                                                          :noexport:
+** EMP
+
+* Todo                                                             :noexport:
+- 
