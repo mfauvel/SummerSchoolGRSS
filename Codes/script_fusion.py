@@ -24,9 +24,7 @@ EMP.shape=(h*w,EMP.shape[2])
 del pcs
 
 # Concatenate the spectral and spatial features and do scaling
-IM_EMP = sp.concatenate((im,EMP),axis=1)
-sc = StandardScaler()
-IM_EMP = sc.fit_transform(IM_EMP)
+IM_EMP = sp.concatenate((im,EMP.astype(im.dtype)),axis=1)
 
 del im,EMP
 
@@ -35,6 +33,11 @@ rt.write_data("../Data/fusion_inputs_university.tif",IM_EMP.reshape(h,w,IM_EMP.s
 
 # Get the training set
 X,y=rt.get_samples_from_roi('../Data/fusion_inputs_university.tif','../Data/university_gt.tif')
+
+# Scale the data
+sc = StandardScaler()
+X = sc.fit_transform(X)
+IM_EMP = sc.transform(IM_EMP)
 
 # Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.1,random_state=0,stratify=y)

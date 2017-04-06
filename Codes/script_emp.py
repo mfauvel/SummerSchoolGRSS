@@ -18,7 +18,7 @@ def morphological_profile(im,radius=1,step=2,no=4):
 
     # Initialization of the output
     [h,w] = im.shape
-    out = sp.empty((h,w,2*no+1))
+    out = sp.empty((h,w,2*no+1),dtype=im.dtype)
     out[:,:,no]=im.copy()
 
     # Start the computation
