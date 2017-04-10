@@ -890,7 +890,7 @@ del pcs
 #+END_SRC
 #+BEGIN_SRC python :tangle ../Codes/script_fusion.py :exports code
 # Concatenate the spectral and spatial features and do scaling
-IM_EMP = sp.concatenate((im,EMP.astype(im.dtype)),axis=1)
+IM_EMP = sp.concatenate((im[:,::2],EMP.astype(im.dtype)),axis=1)
 #+END_SRC
 #+BEGIN_SRC python :tangle ../Codes/script_fusion.py :exports none
 del im,EMP

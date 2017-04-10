@@ -24,7 +24,7 @@ EMP.shape=(h*w,EMP.shape[2])
 del pcs
 
 # Concatenate the spectral and spatial features and do scaling
-IM_EMP = sp.concatenate((im,EMP.astype(im.dtype)),axis=1)
+IM_EMP = sp.concatenate((im[:,::2],EMP.astype(im.dtype)),axis=1)
 
 del im,EMP
 
