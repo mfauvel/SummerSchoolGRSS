@@ -1,0 +1,11 @@
+;
+; ArcView Image Information
+;
+NCOLS       145
+NROWS       145
+NBANDS      220
+NBITS       16
+LAYOUT      BIL
+BYTEORDER   L
+SKIPBYTES   0
+CELLSIZE 1
