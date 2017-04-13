@@ -1024,10 +1024,395 @@ rt.write_data("../Data/tm_university_fusion_mv.tif",out,GeoT,Proj)
 #+ATTR_LATEX: :width 0.6\textwidth
 [[file:./figures/university_tm_fusion_mv.png]]
 
+*** Markov Random Field 1/2
+- Markovian hypothesis/condition cite:6304904: $ p(y_i=c|\mathbf{x}_i,\mathcal{N}_i)$
+- $\mathcal{N}_i$: neighborhood of pixel $i$
+  #+BEGIN_EXPORT latex
+  \begin{center}
+        \begin{tabular}{cc}
+          \tikz[baseline,scale=0.4]{\foreach \x in{-1,0,1,2,3,4}{
+            \draw[] (-1,\x) -- (4,\x);
+            \draw[] (\x,-1) -- (\x,4);
+          }
+          \draw[] (1.5,1.5) node (yi) {\small $y_{i}$};
+          \filldraw[] (0.5,1.5) circle (2pt);
+          \filldraw[] (2.5,1.5) circle (2pt);
+          \filldraw[] (1.5,0.5) circle (2pt);
+          \filldraw[] (1.5,2.5) circle (2pt);
+        }&
+           \tikz[baseline,scale=0.4]{\foreach \x in{-1,0,1,2,3,4}{
+            \draw[] (-1,\x) -- (4,\x);
+            \draw[] (\x,-1) -- (\x,4);
+          }
+           \draw[] (1.5,1.5) node (yi) {\small $y_{i}$};
+           \filldraw[] (0.5,1.5) circle (2pt);
+           \filldraw[] (0.5,0.5) circle (2pt);
+           \filldraw[] (0.5,2.5) circle (2pt);
+           \filldraw[] (1.5,0.5) circle (2pt);
+           \filldraw[] (1.5,2.5) circle (2pt);
+           \filldraw[] (2.5,0.5) circle (2pt);
+           \filldraw[] (2.5,1.5) circle (2pt);
+           \filldraw[] (2.5,2.5) circle (2pt);
+           }\\
+          First-order & Second order
+        \end{tabular}
+      \end{center}
+  #+END_EXPORT
+- When $Y$ is a Markov Random Field: 
+  + $P(Y|\mathbf{X})\propto\exp(-U(Y|\mathbf{X}))$
+  + $U(Y|\mathbf{X})=\sum_{i=1}^nU(y_i|\mathbf{x}_i,\mathcal{N}_i)$
+  + $U(y_i|\mathbf{x}_i,\mathcal{N}_i) = \Omega(\mathbf{x}_i,y_i) + \beta\mathcal{E}(y_i,\mathcal{N}_i)$
+- Spectral term: $\Omega(\mathbf{x}_i,y_i)=-\log[p(\mathbf{x}_i|y_i)]$
+- Spatial term (/Potts model/): $\mathcal{E}(y_i,\mathcal{N}_i)= \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]$
+- <2> _Function to be optimized_
+  $$U(Y|\mathbf{X}) = \sum_{i=1}^n\Big\{-\log[p(\mathbf{x}_i|y_i)] + \beta \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]\Big\}$$
+*** Markov Random Field 2/2
+- Global optimization is not tractable cite:Li:2009:MRF:1529944: iteration of local optimization on
+  $$-\log[p(\mathbf{x}_i|y_i)] + \beta \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]$$
+- Iterated conditional mode:
+  + Scan all the pixels: change the label to maximize the local energy
+  + Stop when convergences is reached
+- Advanced algorithms
+  + Simulated annealing cite:tarabalka2010svm
+  + Graph-cut cite:6304904
+- <2> _For hyperspectral images_: needs classification algorithms robust to the dimensionality!
+*** MRF in action 1/3
+#+BEGIN_SRC python :tangle ../Codes/icm.py :exports none
+import scipy as sp
+import rasterTools as rt
 
+# Convenient functions
+def compute_energy(proba,classes,beta):
+    """
+    The function compute the spatial energy terms of the Potts model
+    classes: a 3x3 array containing the labels, the considered pixels is in the "middle" classes[1,1]
+    proba:  the conditional probabilities of the considered pixels
+    beta: the weight parameter
+    """
 
-*** Markov Random Field
+    # Potts model
+    count = (classes!=classes[1,1]).sum()
+
+    # Add spectral and spatial energy
+    energy = proba + beta*count
+
+    return energy
+
+# Main function
+def fit(proba,labels,beta=4,th=0.000001):
+    """
+    """
+    # Get some parameters and do initialization
+    diff = [1]
+    niter = 0
+    [nl,nc,C]=proba.shape
+#+END_SRC
+- ICM main loop:
+#+BEGIN_SRC python :tangle ../Codes/icm.py :exports code
+    # Iterate until convergence
+    while (diff[-1] > th) and (niter < 100):
+        old_labels= labels.copy() # Make a copy of the old labels
+        for i in xrange(1,nl-1): # Scan each line
+            for j in xrange(1,nc-1): # Scan each column
+                energy = []
+                labels_ = old_labels[i-1:i+2,j-1:j+2].copy()
+                for c in xrange(C): # Compute the energy for the different classes
+                    labels_[1,1] = c+1
+                    energy.append(compute_energy(proba[i,j,c],labels_,beta))
+                arg = sp.argmin(energy) # Get the maximum energy term for the local configuration
+                labels[i,j] = arg + 1
+        diff.append(1 - sp.sum(old_labels == labels ).astype(float)/nc/nl) # Compute the changes
+        niter += 1
+    # Clean data
+    del old_labels
+    return diff
+#+END_SRC
+- Ask SVM for probability outputs
+#+BEGIN_SRC python :tangle ../Codes/script_mrf.py :exports none
+import scipy as sp
+import rasterTools as rt
+from sklearn.preprocessing import StandardScaler
+import icm
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score
+
+# Load data set
+im,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=im.shape
+im.shape=(h*w,b)
+
+# Get the training set
+X,y=rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+
+# Scale the data
+sc = StandardScaler()
+X = sc.fit_transform(X)
+im = sc.transform(im)
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.05,random_state=0,stratify=y)
+
+y_train.shape=(y_train.size,)    
+cv = StratifiedKFold(n_splits=5,random_state=0).split(X_train,y_train)
+grid = GridSearchCV(SVC(), param_grid=dict(gamma=2.0**sp.arange(-4,4), C=10.0**sp.arange(0,3)), cv=cv,n_jobs=-1)
+grid.fit(X_train, y_train)
+clf = grid.best_estimator_
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_mrf.py :exports code
+clf.probability= True
+clf.fit(X_train,y_train)
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_mrf.py :exports none
+yp = clf.predict(X_test).reshape(y_test.shape)
+print f1_score(y_test,yp,average='weighted')
+
+del X_train, X_test, y_train, y_test
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_mrf.py :exports code
+# Predict the whole image and the probability map
+labels = clf.predict(im).reshape(h,w)
+proba = -clf.predict_log_proba(im).reshape(h,w,y.max())
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_mrf.py :exports none
+rt.write_data('../Data/proba_university_svm_proba.tif',proba,GeoT,Proj)
+rt.write_data('../Data/proba_university_svm_labels.tif',labels,GeoT,Proj)
+
+# Run ICM
+diff = icm.fit(proba,labels,beta=1.25,th=0.01)
+print diff
+rt.write_data('../Data/tm_university_svm_mrf.tif',labels,GeoT,Proj)
+#+END_SRC
+*** MRF in action 2/3
+**** Asphalt                                                       :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/proba_uni_1.png]]
+
+**** Tree                                                          :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/proba_uni_4.png]]
+
+**** Metal sheet                                                   :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/proba_uni_5.png]]
+
+*** MRF in action 3/3
+**** Spectral only                                         :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/mrf_labels.png]]
+
+**** MRF                                                   :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/mrf_regul.png]]
+
+**** Iteration                                             :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+BEGIN_EXPORT latex
+\begin{center}
+  \begin{tikzpicture}
+  \begin{axis}[small,width=\textwidth,xlabel=\# Iteration,ylabel=\% of changes,grid=both,xmin=1,xmax=14,ymin=0,ymax=0.15,y tick label style={
+        /pgf/number format/.cd,
+            fixed,
+            fixed zerofill,
+            precision=2,
+        /tikz/.cd
+    },]
+    \addplot[blue,mark=*] coordinates {(1,0.13)
+      (2,0.056)
+      (3,0.034)
+      (4,0.024)
+      (5,0.019)
+      (6,0.016)
+      (7,0.014)
+      (8,0.0134)
+      (9,0.0128)
+      (10,0.012)
+      (11,0.0119)
+      (12,0.0118)
+      (13,0.0118)};
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+#+END_EXPORT
+
 ** Composite kernel
+*** Operations on kernels
+- Let $k_1$  and $k_2$ be positive  semi-definite, and $\lambda_{1,2}>0$ then:
+  1. $\lambda_1k_1$ is a valid kernel
+  2. $\lambda_1k_1+\lambda_2k_2$ is positive semi-definite.
+  3. $k_1k_2$ is positive semi-definite.
+  4. $\exp(k_1)$ is positive semi-definite.
+  5. $g(\mathbf{x}_i)g(\mathbf{x}_j)$  is  positive  semi-definite,  with
+     $g:\mathbb{R}^d\to\mathbb{R}$.
+- A kernel  is usually  seen as  a measure  of similarity  between two
+  samples.  It  reflects in  some sens, how  two samples  are similar.
+- <2> _In  image  classification_. It  is  possible to  build
+  kernels that includes information from the spatial domain.
+  + Local correlation
+  + Spatial position
+  + Morphological feature,
+  + ...
+*** Spatial spectral kernel
+
+    #+BEGIN_EXPORT latex
+    \begin{center}
+      \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
+      \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=4em]
+      \tikzstyle{line} = [draw, -latex']
+      \begin{tikzpicture}
+        \draw (-3,1) node[data] (spaF) {Spectral Feature};
+        \draw (-3,-1) node[data] (speF) {Spatial Feature};
+        \draw (2,1) node[block] (k1) {Kernel};
+        \draw (2,-1) node[block] (k2) {Kernel};
+        \draw (5,0) node[block] (k) {Combination};
+        \path [line] (spaF) -- (k1);
+        \path [line] (speF) -- (k2);
+        \path [line] (k2) -- (k);
+        \path [line] (k1) -- (k);
+      \end{tikzpicture}
+    \end{center}
+#+END_EXPORT
+
+- From cite:1576697:
+  - Feature fusion: $k_{\text{spatial+spectral}}$
+  - Direct summation: $k_{\text{spatial}} + k_{\text{spectral}}$
+  - Weighted summation: $\mu k_{\text{spatial}} + (1-\mu)k_{\text{spectral}}$, $0\leq \mu \leq 1$
+- Can be extended to more than two kernels: /multiple kernel learning/ (tricky)
+*** SS-Kernel in action 1/2
+- Combination of
+  + Spectral bands
+  + Spatial features: local median computed on a moving window 
+- Weighted summation kernel + SVM
+
+#+BEGIN_SRC python :tangle ../Codes/script_CK_mw.py :exports none
+import scipy as sp
+import rasterTools as rt
+from sklearn.preprocessing import StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics.pairwise import rbf_kernel
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import StratifiedKFold, GridSearchCV, train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import f1_score
+
+# Convenient Class for summation kernel
+class CompositeKernel(BaseEstimator,TransformerMixin):
+    def __init__(self,mu=0.5,gamma=1.0):
+        self.gamma = gamma
+        self.mu = mu
+        
+    def transform(self,X):
+        K = self.mu*rbf_kernel(X[:,:-3],self.Xs_,gamma=self.gamma)
+        K += (1-self.mu)*rbf_kernel(X[:,-3:],self.Xw_,gamma=self.gamma)
+        return K
+
+    def fit(self,X,y=None, **fit_params):
+        self.Xs_ = X[:,:-3]
+        self.Xw_ = X[:,-3:]
+        return self
+    
+# Load data
+Xs,y = rt.get_samples_from_roi('../Data/university.tif','../Data/university_gt.tif')
+Xw,y = rt.get_samples_from_roi('../Data/pca_median_11_11_university.tif','../Data/university_gt.tif')
+scs = StandardScaler()
+Xs = scs.fit_transform(Xs)
+scw = StandardScaler()
+Xw = scw.fit_transform(Xw)
+
+# Split data
+Xs_train, Xs_test, y_train, y_test = train_test_split(Xs, y, train_size=0.05,random_state=0,stratify=y)
+Xw_train, Xw_test, y_train, y_test = train_test_split(Xw, y, train_size=0.05,random_state=0,stratify=y)
+y_train.shape=(y_train.size,) 
+X_train = sp.concatenate((Xs_train,Xw_train),axis=1)
+X_test = sp.concatenate((Xs_test,Xw_test),axis=1)
+print X_train.shape
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_CK_mw.py :exports code
+# Create a pipeline
+pipe = Pipeline([
+    ('CK',CompositeKernel()),
+    ('SVM',SVC())
+])
+
+# Optimize parameters
+cv_params = dict([
+    ('CK__gamma', 2.0**sp.arange(-3,3)),
+    ('CK__mu', sp.linspace(0,1,num=11)),
+    ('SVM__kernel', ['precomputed']),
+    ])
+#+END_SRC
+#+BEGIN_SRC python :tangle ../Codes/script_CK_mw.py :exports none
+cv = StratifiedKFold(n_splits=5,random_state=0).split(X_train,y_train)
+grid = GridSearchCV(pipe, cv_params, cv=cv, verbose=1, n_jobs=-1)
+grid.fit(X_train, y_train)
+print grid.best_params_
+clf = grid.best_estimator_
+clf.fit(X_train, y_train)
+yp = clf.predict(X_test)
+print f1_score(y_test,yp,average='weighted')
+
+# Load image
+ims,GeoT,Proj = rt.open_data('../Data/university.tif')
+[h,w,b]=ims.shape
+ims.shape=(h*w,b)
+imw,GeoT,Proj = rt.open_data('../Data/pca_median_11_11_university.tif')
+[h,w,b]=imw.shape
+imw.shape=(h*w,b)
+ims = scs.transform(ims)
+imw = scw.transform(imw)
+im = sp.concatenate((ims,imw),axis=1)
+del imw, ims, X_train, X_test, Xs_train, Xs_test, Xw_train, Xw_test,
+imp = clf.predict(im)
+rt.write_data('../Data/tm_university_ck_mw.tif',imp.reshape(h,w),GeoT,Proj)
+#+END_SRC
+*** SS-Kernel in action 2/2
+**** Spectral only                                         :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/mrf_labels.png]]
+
+**** Composite kernel                                      :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+#+ATTR_LATEX: :width 0.9\textwidth
+[[file:./figures/university_tm_ck_mw.png]]
+
+**** Parameters                                            :B_block:BMCOL:
+:PROPERTIES:
+:BEAMER_col: 0.3
+:BEAMER_env: block
+:END:
+- F1 = 0.89
+- $\mu$ = 0.8
+
 * References                                                         :export:
 *** Bibliography
   :PROPERTIES:

@@ -1,4 +1,4 @@
-% Created 2017-04-03 Mon 22:37
+% Created 2017-04-13 Thu 10:31
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,aspectratio=1610]{beamer}
 \usepackage[utf8]{inputenc}
@@ -40,8 +40,8 @@
 \end{frame}
 
 \section{Motivations}
-\label{sec:orgdbb0df2}
-\begin{frame}[label={sec:orgb80edef}]{Classification of hyperspectral image is a challenging problem}
+\label{sec:org13dd03d}
+\begin{frame}[label={sec:orgfced2c9}]{Classification of hyperspectral image is a challenging problem}
 \begin{itemize}
 \item Remember \emph{Introduction}: \alert{High dimensional data}
 \begin{itemize}
@@ -63,7 +63,7 @@
 \end{center}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0b0bfb9}]{Classification overview}
+\begin{frame}[label={sec:org93a833d}]{Classification overview}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{itemize}
@@ -93,7 +93,7 @@
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org8e502ae}]{Data sets used}
+\begin{frame}[label={sec:orge93ef81}]{Data sets used}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -108,10 +108,10 @@
 \end{columns}
 \end{frame}
 \section{Introductory examples}
-\label{sec:org0899025}
+\label{sec:orga6ebf69}
 \subsection{Influence of the number of samples}
-\label{sec:org2e211c1}
-\begin{frame}[fragile,label={sec:orgbe81852}]{Experimental set-up}
+\label{sec:org8bc32ed}
+\begin{frame}[fragile,label={sec:org9e45da8}]{Experimental set-up}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import scipy as sp
 import rasterTools as rt
@@ -141,7 +141,7 @@ for i,split in enumerate(SPLIT):
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org8b796c1}]{Results}
+\begin{frame}[label={sec:org6194439}]{Results}
 \begin{center}
   \begin{tikzpicture}
   \begin{semilogxaxis}[width=0.7\textwidth,height=0.3\textwidth,xlabel=Number of samples,ylabel=F1,grid=both,xmin=0,ymax=1]
@@ -156,8 +156,8 @@ for i,split in enumerate(SPLIT):
 \end{itemize}
 \end{frame}
 \subsection{Influence of the number of features}
-\label{sec:org8cd350b}
-\begin{frame}[fragile,label={sec:orgc23cacb}]{Experimental set-up}
+\label{sec:orge8b9fea}
+\begin{frame}[fragile,label={sec:org7d32056}]{Experimental set-up}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import scipy as sp
 import rasterTools as rt
@@ -187,7 +187,7 @@ for i,skip in enumerate(SKIP):
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgf2c27f1}]{Results}
+\begin{frame}[label={sec:org784c3d3}]{Results}
 \begin{center}
   \begin{tikzpicture}
   \begin{axis}[width=0.7\textwidth,height=0.3\textwidth,xlabel=Number of features,ylabel=F1,grid=both,xmin=0,ymax=1]
@@ -198,8 +198,8 @@ for i,skip in enumerate(SKIP):
 \end{frame}
 
 \subsection{Comparison of state of the art classifier}
-\label{sec:orgb1966f0}
-\begin{frame}[fragile,label={sec:orgaa6c717}]{Experimental set-up}
+\label{sec:orgddc45c3}
+\begin{frame}[fragile,label={sec:orgbb8b7dd}]{Experimental set-up}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 if __name__ == '__main__':
     # Load data set
@@ -229,7 +229,7 @@ if __name__ == '__main__':
     CT.append(time.time()-ts)
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:org3d69940}]{Results}
+\begin{frame}[label={sec:org4f1b9a1}]{Results}
 \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{center}
@@ -272,7 +272,7 @@ Class & \(\bullet\) & \(\blacksquare\)\\
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org9380a70}]{Classification Map}
+\begin{frame}[label={sec:org7873d16}]{Classification Map}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -288,8 +288,8 @@ Class & \(\bullet\) & \(\blacksquare\)\\
 \end{frame}
 
 \subsection{Comparison spectral feature extraction}
-\label{sec:orgb601818}
-\begin{frame}[fragile,label={sec:orgd930dfb}]{PCA, LDA and KPCA}
+\label{sec:orgf1f1899}
+\begin{frame}[fragile,label={sec:orgae99823}]{PCA, LDA and KPCA}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 DATA = ['../Data/university.tif','../Data/pca_university.tif','../Data/lda_university.tif',
         '../Data/kpca_university.tif']
@@ -317,10 +317,10 @@ for data in DATA:
 \end{center}
 \end{frame}
 \section{Spatial-spectral Classification}
-\label{sec:orga83396d}
+\label{sec:org71c2fd9}
 \subsection{Introduction}
-\label{sec:orgdd96ebe}
-\begin{frame}[label={sec:org6254da1}]{Overview of spatial-spectral methods}
+\label{sec:org068b131}
+\begin{frame}[label={sec:org5a151af}]{Overview of spatial-spectral methods}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{block}{Spatial inter-pixel dependency}
@@ -366,7 +366,7 @@ for data in DATA:
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org5db2f1e}]{Question to solve}
+\begin{frame}[label={sec:org326dc6c}]{Question to solve}
 \begin{enumerate}
 \item What kind of information is needed ?
 \item How to extract it from the data ?
@@ -374,8 +374,8 @@ for data in DATA:
 \end{enumerate}
 \end{frame}
 \subsection{Spatial filter}
-\label{sec:orga99ed05}
-\begin{frame}[fragile,label={sec:orgc03e031}]{Texture information}
+\label{sec:org048cde6}
+\begin{frame}[fragile,label={sec:org0b9fac8}]{Texture information}
  \begin{itemize}
 \item Template filters
 \begin{itemize}
@@ -409,7 +409,7 @@ otbcli_HaralickTextureExtraction -in ../Data/pca_university.tif -channel 1 \
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgef749b4}]{Morphological neighborhood}
+\begin{frame}[label={sec:orge704bbf}]{Morphological neighborhood}
 \begin{center}
 \includegraphics[trim = 0mm 0mm 0mm 40mm,clip,width=0.25\textwidth]{./figures/neighbors_1.pdf}
 \end{center}
@@ -428,7 +428,7 @@ MRF & 8-connectivity & 4-connectivity& MN
 \end{example}
 \end{frame}
 
-\begin{frame}[label={sec:orgc27bc15}]{Morphological profile}
+\begin{frame}[label={sec:org37d99c3}]{Morphological profile}
 \begin{definition}[Morphological profile]
 The Morphological  Profile of  size \(n\) is  a \((2n+1)\)-dimensional
 vector such as:\vspace{-0.25cm}
@@ -451,7 +451,7 @@ For a given pixel \(\mathbf{x}\), information include in the MP(\(\mathbf{x}\)) 
 \item <2> \uline{Size}:  Is the structure to which the  pixel belongs to  small or big compared to \(G\)?
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org2d2bf14}]{Derivative of the MP}
+\begin{frame}[label={sec:orgcf3c859}]{Derivative of the MP}
 \begin{definition}[Derivative of the morphological profile]
 The  Derivative  of  the  Morphological  Profile  of  size  \(n\)  is  a \((2n)\)-dimensional vector such as:\vspace{-0.25cm}
 
@@ -465,7 +465,7 @@ $$\text{DMP}(\mathbf{x})=\Big[|\phi_n(\mathbf{x})-\phi_{n-1}(\mathbf{x})|,\ldots
 \includegraphics[width=0.75\textwidth,height=0.15\textwidth]{./figures/DMP_im.pdf}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org26e4230}]{Limits of the (D)MP}
+\begin{frame}[label={sec:org3aec75c}]{Limits of the (D)MP}
 \begin{itemize}
 \item Geodesics filters only act on extrema structures
 \item <4> Self-complementary area filter
@@ -477,7 +477,7 @@ $$\text{DMP}(\mathbf{x})=\Big[|\phi_n(\mathbf{x})-\phi_{n-1}(\mathbf{x})|,\ldots
 \only<3>{\centerline{\includegraphics[width=0.60\textwidth]{figures/close_g}}}
 \only<4>{\centerline{\includegraphics[width=0.60\textwidth]{figures/area_g}}}
 \end{frame}
-\begin{frame}[label={sec:org1f2d151}]{Self-complementary area filter}
+\begin{frame}[label={sec:org5e51259}]{Self-complementary area filter}
 \begin{itemize}
 \item Self-complementarity: \(\Psi = \mathbf{C}\Psi\Rightarrow\) each structure is processed equally.
 \item Area filter: Removes small structures (area = number of pixels).
@@ -494,7 +494,7 @@ $$\text{DMP}(\mathbf{x})=\Big[|\phi_n(\mathbf{x})-\phi_{n-1}(\mathbf{x})|,\ldots
 Original & $\lambda =10$ & $\lambda =30$ & $\lambda =40$
 \end{tabular}}
 \end{frame}
-\begin{frame}[label={sec:org226cb8b}]{MN based on area filtering}
+\begin{frame}[label={sec:org211929d}]{MN based on area filtering}
 \begin{itemize}
 \item Extract the inter-pixel dependency \(\Upsilon\):
 
@@ -511,7 +511,7 @@ Original & $\lambda =10$ & $\lambda =30$ & $\lambda =40$
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org079de55}]{Extended Morphological Profile}
+\begin{frame}[label={sec:org1fe5a3e}]{Extended Morphological Profile}
 \begin{definition}[Extended Morphological Profile]
 The EMP of  size \(n\times p\) is a  \((2n+1)p\)-dimensional vector made
 of   the  MP   build  with   the  \(p\)   first  principal   components:
@@ -526,7 +526,7 @@ $$\text{EMP}(\mathbf{x})=\Big[\text{MP}_1(\mathbf{x}),\ldots,\text{MP}_p(\mathbf
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgc2a68ed}]{Application case: Extended Morphological Profile}
+\begin{frame}[fragile,label={sec:org3ba0690}]{Application case: Extended Morphological Profile}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
     # Start the computation
     for i in xrange(no):
@@ -556,7 +556,7 @@ if __name__ == '__main__':
     rt.write_data("../Data/emp_pca_university.tif",EMP,GeoT,Proj)
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:orgb108fa4}]{Questions 1/2}
+\begin{frame}[label={sec:org44e820e}]{Questions 1/2}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -578,7 +578,7 @@ if __name__ == '__main__':
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orga8c6d13}]{Questions 2/2}
+\begin{frame}[label={sec:orge9d3f3f}]{Questions 2/2}
 Where is the \emph{closing} and the \emph{opening} ?
 \begin{columns}
 \begin{column}{0.3\columnwidth}
@@ -602,8 +602,8 @@ Where is the \emph{closing} and the \emph{opening} ?
 \end{frame}
 
 \subsection{Data fusion}
-\label{sec:orgb56fab0}
-\begin{frame}[label={sec:org1601edc}]{Feature fusion 1/2}
+\label{sec:org17c9116}
+\begin{frame}[label={sec:org5292eba}]{Feature fusion 1/2}
 \begin{center}
   \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
   \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=4em]
@@ -624,7 +624,7 @@ Where is the \emph{closing} and the \emph{opening} ?
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org014c4b4}]{Feature fusion 2/2}
+\begin{frame}[label={sec:org4674f3e}]{Feature fusion 2/2}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{itemize}
@@ -670,7 +670,7 @@ S-DBFE+EMP-DBFE & 27+10 & 88.0\\
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org16b1d72}]{Classifier fusion 1/2}
+\begin{frame}[label={sec:org8ad355a}]{Classifier fusion 1/2}
 \begin{center}
   \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
   \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=2em]
@@ -697,7 +697,7 @@ S-DBFE+EMP-DBFE & 27+10 & 88.0\\
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org13e550c}]{Classifier fusion 2/2}
+\begin{frame}[label={sec:org0b3c8ab}]{Classifier fusion 2/2}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{itemize}
@@ -742,15 +742,15 @@ Output fusion & 89.6\\
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org11b2e48}]{Data fusion in action}
+\begin{frame}[fragile,label={sec:orgd1ee8f0}]{Data fusion in action}
  \begin{itemize}
 \item Simple to implement:
+\end{itemize}
 \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 # Concatenate the spectral and spatial features and do scaling
-IM_EMP = sp.concatenate((im,EMP),axis=1)
-sc = StandardScaler()
-IM_EMP = sc.fit_transform(IM_EMP)
+IM_EMP = sp.concatenate((im[:,::2],EMP.astype(im.dtype)),axis=1)
 \end{minted}
+\begin{itemize}
 \item Good classification accuracy: \(F1=0.99\)
 \item sptial
 \end{itemize}
@@ -774,8 +774,8 @@ IM_EMP = sc.fit_transform(IM_EMP)
 \end{columns}
 \end{frame}
 \subsection{Spatial post-regularization}
-\label{sec:orge7321d4}
-\begin{frame}[label={sec:org1f2bd7c}]{Segmentation 1/4}
+\label{sec:org785ef7c}
+\begin{frame}[label={sec:orgb23ba82}]{Segmentation 1/4}
 \begin{itemize}
 \item Main ideas
 \begin{itemize}
@@ -802,7 +802,7 @@ IM_EMP = sc.fit_transform(IM_EMP)
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:orgc34802d}]{Segmentation 2/4}
+\begin{frame}[fragile,label={sec:org36bb8a2}]{Segmentation 2/4}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{bash}
 # Using Mean Shift
 otbcli_Segmentation -in ../Data/pca_university.tif -mode raster -mode.raster.out ../Data/mean_shift_university.tif \
@@ -824,7 +824,7 @@ otbcli_Segmentation -in ../Data/pca_university.tif -mode raster -mode.raster.out
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:orgd53d1f3}]{Segmentation 3/4}
+\begin{frame}[fragile,label={sec:org58ca90c}]{Segmentation 3/4}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
@@ -848,7 +848,7 @@ rt.write_data("../Data/tm_university_fusion_mv.tif",out,GeoT,Proj)
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org3a4e00e}]{Segmentation 4/4}
+\begin{frame}[label={sec:org6f09e81}]{Segmentation 4/4}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -865,18 +865,295 @@ rt.write_data("../Data/tm_university_fusion_mv.tif",out,GeoT,Proj)
 \end{columns}
 \end{frame}
 
-
-
-\begin{frame}[label={sec:orgbe4d64c}]{Markov Random Field}
+\begin{frame}[label={sec:org3665db2}]{Markov Random Field 1/2}
+\begin{itemize}
+\item Markovian hypothesis/condition \cite{6304904}: \(p(y_i=c|\mathbf{x}_i,\mathcal{N}_i)\)
+\item \(\mathcal{N}_i\): neighborhood of pixel \(i\)
+\begin{center}
+      \begin{tabular}{cc}
+        \tikz[baseline,scale=0.4]{\foreach \x in{-1,0,1,2,3,4}{
+          \draw[] (-1,\x) -- (4,\x);
+          \draw[] (\x,-1) -- (\x,4);
+        }
+        \draw[] (1.5,1.5) node (yi) {\small $y_{i}$};
+        \filldraw[] (0.5,1.5) circle (2pt);
+        \filldraw[] (2.5,1.5) circle (2pt);
+        \filldraw[] (1.5,0.5) circle (2pt);
+        \filldraw[] (1.5,2.5) circle (2pt);
+      }&
+         \tikz[baseline,scale=0.4]{\foreach \x in{-1,0,1,2,3,4}{
+          \draw[] (-1,\x) -- (4,\x);
+          \draw[] (\x,-1) -- (\x,4);
+        }
+         \draw[] (1.5,1.5) node (yi) {\small $y_{i}$};
+         \filldraw[] (0.5,1.5) circle (2pt);
+         \filldraw[] (0.5,0.5) circle (2pt);
+         \filldraw[] (0.5,2.5) circle (2pt);
+         \filldraw[] (1.5,0.5) circle (2pt);
+         \filldraw[] (1.5,2.5) circle (2pt);
+         \filldraw[] (2.5,0.5) circle (2pt);
+         \filldraw[] (2.5,1.5) circle (2pt);
+         \filldraw[] (2.5,2.5) circle (2pt);
+         }\\
+        First-order & Second order
+      \end{tabular}
+    \end{center}
+\item When \(Y\) is a Markov Random Field: 
+\begin{itemize}
+\item \(P(Y|\mathbf{X})\propto\exp(-U(Y|\mathbf{X}))\)
+\item \(U(Y|\mathbf{X})=\sum_{i=1}^nU(y_i|\mathbf{x}_i,\mathcal{N}_i)\)
+\item \(U(y_i|\mathbf{x}_i,\mathcal{N}_i) = \Omega(\mathbf{x}_i,y_i) + \beta\mathcal{E}(y_i,\mathcal{N}_i)\)
+\end{itemize}
+\item Spectral term: \(\Omega(\mathbf{x}_i,y_i)=-\log[p(\mathbf{x}_i|y_i)]\)
+\item Spatial term (\emph{Potts model}): \(\mathcal{E}(y_i,\mathcal{N}_i)= \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]\)
+\item <2> \uline{Function to be optimized}
+$$U(Y|\mathbf{X}) = \sum_{i=1}^n\Big\{-\log[p(\mathbf{x}_i|y_i)] + \beta \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]\Big\}$$
+\end{itemize}
 \end{frame}
+\begin{frame}[label={sec:orgd7a9120}]{Markov Random Field 2/2}
+\begin{itemize}
+\item Global optimization is not tractable \cite{Li:2009:MRF:1529944}: iteration of local optimization on
+$$-\log[p(\mathbf{x}_i|y_i)] + \beta \sum_{j\in\mathcal{N}_i}[1-\delta(y_i,y_j)]$$
+\item Iterated conditional mode:
+\begin{itemize}
+\item Scan all the pixels: change the label to maximize the local energy
+\item Stop when convergences is reached
+\end{itemize}
+\item Advanced algorithms
+\begin{itemize}
+\item Simulated annealing \cite{tarabalka2010svm}
+\item Graph-cut \cite{6304904}
+\end{itemize}
+\item <2> \uline{For hyperspectral images}: needs classification algorithms robust to the dimensionality!
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile,label={sec:org0d3af8c}]{MRF in action 1/3}
+ \begin{itemize}
+\item ICM main loop:
+\end{itemize}
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+    # Iterate until convergence
+    while (diff[-1] > th) and (niter < 100):
+        old_labels= labels.copy() # Make a copy of the old labels
+        for i in xrange(1,nl-1): # Scan each line
+            for j in xrange(1,nc-1): # Scan each column
+                energy = []
+                labels_ = old_labels[i-1:i+2,j-1:j+2].copy()
+                for c in xrange(C): # Compute the energy for the different classes
+                    labels_[1,1] = c+1
+                    energy.append(compute_energy(proba[i,j,c],labels_,beta))
+                arg = sp.argmin(energy) # Get the maximum energy term for the local configuration
+                labels[i,j] = arg + 1
+        diff.append(1 - sp.sum(old_labels == labels ).astype(float)/nc/nl) # Compute the changes
+        niter += 1
+    # Clean data
+    del old_labels
+    return diff
+\end{minted}
+\begin{itemize}
+\item Ask SVM for probability outputs
+\end{itemize}
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+clf.probability= True
+clf.fit(X_train,y_train)
+\end{minted}
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+# Predict the whole image and the probability map
+labels = clf.predict(im).reshape(h,w)
+proba = -clf.predict_log_proba(im).reshape(h,w,y.max())
+\end{minted}
+\end{frame}
+\begin{frame}[label={sec:org7ef68b0}]{MRF in action 2/3}
+\begin{columns}
+\begin{column}{0.3\columnwidth}
+\begin{block}{Asphalt}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/proba_uni_1.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{Tree}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/proba_uni_4.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{Metal sheet}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/proba_uni_5.png}
+\end{center}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label={sec:org6b7a7c4}]{MRF in action 3/3}
+\begin{columns}
+\begin{column}{0.3\columnwidth}
+\begin{block}{Spectral only}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/mrf_labels.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{MRF}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/mrf_regul.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{Iteration}
+\begin{center}
+  \begin{tikzpicture}
+  \begin{axis}[small,width=\textwidth,xlabel=\# Iteration,ylabel=\% of changes,grid=both,xmin=1,xmax=14,ymin=0,ymax=0.15,y tick label style={
+        /pgf/number format/.cd,
+            fixed,
+            fixed zerofill,
+            precision=2,
+        /tikz/.cd
+    },]
+    \addplot[blue,mark=*] coordinates {(1,0.13)
+      (2,0.056)
+      (3,0.034)
+      (4,0.024)
+      (5,0.019)
+      (6,0.016)
+      (7,0.014)
+      (8,0.0134)
+      (9,0.0128)
+      (10,0.012)
+      (11,0.0119)
+      (12,0.0118)
+      (13,0.0118)};
+  \end{axis}
+  \end{tikzpicture}
+\end{center}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
 \subsection{Composite kernel}
-\label{sec:org5b423c0}
+\label{sec:org630ebfe}
+\begin{frame}[label={sec:org22ad08e}]{Operations on kernels}
+\begin{itemize}
+\item Let \(k_1\)  and \(k_2\) be positive  semi-definite, and \(\lambda_{1,2}>0\) then:
+\begin{enumerate}
+\item \(\lambda_1k_1\) is a valid kernel
+\item \(\lambda_1k_1+\lambda_2k_2\) is positive semi-definite.
+\item \(k_1k_2\) is positive semi-definite.
+\item \(\exp(k_1)\) is positive semi-definite.
+\item \(g(\mathbf{x}_i)g(\mathbf{x}_j)\)  is  positive  semi-definite,  with
+\(g:\mathbb{R}^d\to\mathbb{R}\).
+\end{enumerate}
+\item A kernel  is usually  seen as  a measure  of similarity  between two
+samples.  It  reflects in  some sens, how  two samples  are similar.
+\item <2> \uline{In  image  classification}. It  is  possible to  build
+kernels that includes information from the spatial domain.
+\begin{itemize}
+\item Local correlation
+\item Spatial position
+\item Morphological feature,
+\item \ldots{}
+\end{itemize}
+\end{itemize}
+\end{frame}
+\begin{frame}[label={sec:org58286c6}]{Spatial spectral kernel}
+\begin{center}
+  \tikzstyle{data} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
+  \tikzstyle{block} = [rectangle, draw, fill=blue!20,text width=5em, text centered, rounded corners, minimum height=4em]
+  \tikzstyle{line} = [draw, -latex']
+  \begin{tikzpicture}
+    \draw (-3,1) node[data] (spaF) {Spectral Feature};
+    \draw (-3,-1) node[data] (speF) {Spatial Feature};
+    \draw (2,1) node[block] (k1) {Kernel};
+    \draw (2,-1) node[block] (k2) {Kernel};
+    \draw (5,0) node[block] (k) {Combination};
+    \path [line] (spaF) -- (k1);
+    \path [line] (speF) -- (k2);
+    \path [line] (k2) -- (k);
+    \path [line] (k1) -- (k);
+  \end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+\item From \cite{1576697}:
+\begin{itemize}
+\item Feature fusion: \(k_{\text{spatial+spectral}}\)
+\item Direct summation: \(k_{\text{spatial}} + k_{\text{spectral}}\)
+\item Weighted summation: \(\mu k_{\text{spatial}} + (1-\mu)k_{\text{spectral}}\), \(0\leq \mu \leq 1\)
+\end{itemize}
+\item Can be extended to more than two kernels: \emph{multiple kernel learning} (tricky)
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile,label={sec:org9973fba}]{SS-Kernel in action 1/}
+ \begin{itemize}
+\item Combination of
+\begin{itemize}
+\item Spectral bands
+\item Spatial features: local median computed on a moving window
+\end{itemize}
+\item Weighted summation kernel + SVM
+\end{itemize}
+
+\begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
+# Create a pipeline
+pipe = Pipeline([
+    ('CK',CompositeKernel()),
+    ('SVM',SVC())
+])
+
+# Optimize parameters
+cv_params = dict([
+    ('CK__gamma', 2.0**sp.arange(-3,3)),
+    ('CK__mu', sp.linspace(0,1,num=11)),
+    ('SVM__kernel', ['precomputed']),
+    ])
+\end{minted}
+\end{frame}
+\begin{frame}[label={sec:orgfff130f}]{SS-Kernel in action 2/}
+\begin{columns}
+\begin{column}{0.3\columnwidth}
+\begin{block}{Spectral only}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/mrf_labels.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{Composite kernel}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{./figures/university_tm_ck_mw.png}
+\end{center}
+\end{block}
+\end{column}
+
+\begin{column}{0.3\columnwidth}
+\begin{block}{Parameters}
+\begin{itemize}
+\item F1 = 0.89
+\item \(\mu\) = 0.8
+\end{itemize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+
 \section{References}
-\label{sec:org02f18dd}
+\label{sec:org3281717}
 \begin{frame}[fragile,allowframebreaks,label=]{Bibliography}
 \printbibliography
 \end{frame}
-\begin{frame}[label={sec:org6b47b03}]{}
+\begin{frame}[label={sec:orgf92bf57}]{}
 \begin{center}
 \tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
 \normalsize
