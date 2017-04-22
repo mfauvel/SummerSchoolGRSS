@@ -337,7 +337,7 @@ rt.write_data("../Data/Moffett_abundances.tif",abundances,GeoT,Proj)
 *** Abundances 4/4
 #+ATTR_LATEX: :width 0.7\textwidth 
 [[file:./figures/abundances_vegetation.png]]
-** Advances abundance estimation
+** Advanced abundance estimation
 *** Sparse unmixing
 - When the number of endmembers are large (e.g. selected from spectral
   library), the observed  spectral vector is usually  a combination of
@@ -361,6 +361,30 @@ rt.write_data("../Data/Moffett_abundances.tif",abundances,GeoT,Proj)
   \end{eqnarray*}
   \end{center}
   #+END_EXPORT
+*** Spatial/Contextual unmixing
+- Add spatial constraints during the optimization
+- Total variation cite:DBLP:journals/tgrs/IordacheBP12: measure the spatial variation of abundances for neighboring pixels
+  $$ TV(\boldsymbol{\alpha}_i) = \sum_{j\in \mathcal{N}_i} \|\boldsymbol{\alpha}_i-\boldsymbol{\alpha}_j\|_{1}$$
+- Global optimization rather than pixel wise optimization:
+  #+BEGIN_EXPORT latex
+\begin{center}
+  \begin{eqnarray*}
+     \sum_{i=1}^n   \|\mathbf{x}_i-\mathbf{M}\boldsymbol{\alpha}_i\|^2 + \lambda \sum_{i=1}^n\|\boldsymbol{\alpha}_i\|_{1} + \lambda_{TV}\sum_{i=1}^nTV(\boldsymbol{\alpha}_i)\\
+     \text{Subject to }\alpha_{i,j}\geq 0, \forall j=1,\ldots,p \text{ and } i=1,\ldots,n
+  \end{eqnarray*}
+\end{center}
+#+END_EXPORT
+*** Bayesian modelling
+- Likelihood formulation
+  $$f(\mathbf{x}_i|\mathbf{M},\boldsymbol{\alpha}_i,\sigma^2) = \left(\frac{1}{2\pi\sigma^2}\right)^{d/2}\exp\left(-\frac{\|\mathbf{x}_i-\mathbf{M}\boldsymbol{\alpha}_i\|^2}{2\sigma^2}\right)$$
+- Conjoint estimation of /endmembers/ and /abundances/ cite:Dobigeon_IEEE_Trans_SP_2009
+- Rely in MCMC algorithm
+  + Long processing time
+  + Provide usually better results than geometric methods in critical situation (no pure pixels...)
+- Possible to add spatial dependencies cite:Eches_IEEE_Trans_GRS_2011
+
+#+ATTR_LATEX: :width 0.4\linewidth
+[[file:./figures/bayesian.png]]
 * References                                                         :export:
 *** Bibliography
   :PROPERTIES:
