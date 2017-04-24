@@ -1,0 +1,35 @@
+#+TITLE: Hyperspectral image processing
+#+AUTHORS: M. Fauvel
+
+This repository contains  all the files for  the course "Hyperspectral
+image  processing" given  in Algiers,  Algery for  the first  /Algerian
+Geoscience and Remote Sensing Spring School 2017/.
+
+It contains the following folders.
+
+#+BEGIN_SRC sh :exports results
+tree -L 1
+#+END_SRC
+
+#+RESULTS:
+| 0   |                   |        |                               |
+| ├── | Classification    |        |                               |
+| ├── | Codes             |        |                               |
+| ├── | Data              |        |                               |
+| ├── | FeatureExtraction |        |                               |
+| ├── | Introduction      |        |                               |
+| ├── | LabWorks          |        |                               |
+| ├── | project.org       |        |                               |
+| ├── | project.org~      |        |                               |
+| ├── | #README.org#      |        |                               |
+| ├── | README.org        |        |                               |
+| └── | Unmixing          |        |                               |
+|     |                   |        |                               |
+| 9   | directories,      |      6 | files                         |
+
+
+The folder  =Data= contains  the data  sets use  during the  school, for
+illustration and labworks. The folder  =Codes= contains all the python /
+OTB codes used to generate the results.
+
+All this work is under the licence [[https://creativecommons.org/licenses/by-sa/4.0/][Creative Commons Attribution-ShareAlike 4.0]].
