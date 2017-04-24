@@ -7,25 +7,23 @@ Geoscience and Remote Sensing Spring School 2017/.
 
 It contains the following folders.
 
-#+BEGIN_SRC sh :exports results
+#+BEGIN_SRC sh :exports results :results output
 tree -L 1
 #+END_SRC
 
 #+RESULTS:
-| 0   |                   |        |                               |
-| ├── | Classification    |        |                               |
-| ├── | Codes             |        |                               |
-| ├── | Data              |        |                               |
-| ├── | FeatureExtraction |        |                               |
-| ├── | Introduction      |        |                               |
-| ├── | LabWorks          |        |                               |
-| ├── | project.org       |        |                               |
-| ├── | project.org~      |        |                               |
-| ├── | #README.org#      |        |                               |
-| ├── | README.org        |        |                               |
-| └── | Unmixing          |        |                               |
-|     |                   |        |                               |
-| 9   | directories,      |      6 | files                         |
+#+begin_example
+.
+├── Classification
+├── Codes
+├── Data
+├── FeatureExtraction
+├── Introduction
+├── LabWorks
+├── README.org
+└── Unmixing
+#+end_example
+
 
 
 The folder  =Data= contains  the data  sets use  during the  school, for
