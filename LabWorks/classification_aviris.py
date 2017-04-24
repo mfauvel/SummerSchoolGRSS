@@ -4,7 +4,7 @@
 import sys
 sys.path.insert(0, '../Codes/')
 
-# Do some usefull import
+# Do some usefull imports
 import scipy as sp
 import rasterTools as rt
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
