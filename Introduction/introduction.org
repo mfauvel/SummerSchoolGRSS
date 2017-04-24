@@ -54,7 +54,12 @@
 \end{center}
 
 #+END_EXPORT
-- Associate professor at  [[http://ensat.fr/][ENSAT]] - [[http://inp-toulouse.fr/][INP Toulouse]] & [[http://www.univ-toulouse.fr/][University of Toulouse]]
+- Short CV
+  * 2004-2007: PhD [[http://www.gipsa-lab.grenoble-inp.fr/][GIPSA-lab]] & [[http://english.hi.is/][University of Iceland]]
+  * 2007-2008: Assistant Professor [[http://www.grenoble-inp.fr/][Grenoble INP]]
+  * 2008-2010: Post-Doc position INRIA [[https://mistis.inrialpes.fr/index_en.html][Mistis Team]]
+  * 2010-2011: Assistant Professor INP Toulouse
+  * Since 2011: Associate professor at  [[http://ensat.fr/][ENSAT]] - [[http://inp-toulouse.fr/][INP Toulouse]] & [[http://www.univ-toulouse.fr/][University of Toulouse]]
 - Director of the Engineering and Digital Sciences Department at the National Institute of Agronomy of Toulouse (ENSAT).
 - Associated to the [[http://dynafor.toulouse.inra.fr/][DYNAFOR]] lab
 - IEEE GRSS:
@@ -317,7 +322,7 @@ temporel process/.
   | Multispectral | ~ 10            |
   |---------------+-----------------|
   | Hyperspectral | > 100           |
-  | Ultraspectral | > 100           |
+  | Ultraspectral | > 1000          |
 - Spatial and spectral  resolution are linked: difficult  to have high
   spatial /and/ spectral resolution at the same time.
 *** Multispectral versus hyperspectral

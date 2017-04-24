@@ -302,14 +302,14 @@ From the histogram, which one does correspond to the NDVI of the image ?
 - <2-> Lagrangian:
   #+BEGIN_EXPORT latex
   \begin{eqnarray*}
-    \mathcal{L}(\mathbf{v}_2,\lambda_2,\beta_1) = \mathbf{v}_2^\top\boldsymbol{\Sigma}\mathbf{v}_2 + \lambda_1(1- \mathbf{v}_2^\top\mathbf{v}_2) + \beta_1(0 - \mathbf{v}_2^\top\mathbf{v}_1)
+    \mathcal{L}(\mathbf{v}_2,\lambda_2,\beta_1) = \mathbf{v}_2^\top\boldsymbol{\Sigma}\mathbf{v}_2 + \lambda_2(1- \mathbf{v}_2^\top\mathbf{v}_2) + \beta_1(0 - \mathbf{v}_2^\top\mathbf{v}_1)
   \end{eqnarray*}
   #+END_EXPORT
 - <3-> Compute the derivative w.r.t $\mathbf{v}_2$:
    #+BEGIN_EXPORT latex
   \begin{eqnarray*}
-  \frac{\partial\mathcal{L}}{\partial\mathbf{v}_2} &=& 2\boldsymbol{\Sigma}\mathbf{v}_2-2\lambda_1\mathbf{v}_2-\beta_1\mathbf{v}_1\\
-  \boldsymbol{\Sigma}\mathbf{v}_2 &=& \lambda_1\mathbf{v}_2+2\beta_1\mathbf{v}_1
+  \frac{\partial\mathcal{L}}{\partial\mathbf{v}_2} &=& 2\boldsymbol{\Sigma}\mathbf{v}_2-2\lambda_2\mathbf{v}_2-\beta_1\mathbf{v}_1\\
+  \boldsymbol{\Sigma}\mathbf{v}_2 &=& \lambda_2\mathbf{v}_2+2\beta_1\mathbf{v}_1
   \end{eqnarray*}
   #+END_EXPORT
 - <4-> At optimality, $\langle\mathbf{v}_1,\mathbf{v}_2\rangle=0$. Left-multiplying by $\mathbf{v}_1^\top$ the above equation:
@@ -597,7 +597,7 @@ sp.savetxt('../FeatureExtraction/figures/kpca_pcs.csv',D,delimiter=',')
     \end{tikzpicture}
   \end{center}
   #+END_EXPORT
-- Principal components
+- Principal kernel components
   #+BEGIN_EXPORT latex
   \begin{center}
     \begin{tikzpicture}
@@ -960,11 +960,11 @@ $\mathcal{S}=\{(\mathbf{x}_i,y_i)\}_{i=1}^n$                       and
 $\mathbf{x}\in\mathbb{R}^{d}$. The number of classes $C$ is $3$.  What
 is the /maximum/ number of features that can be extracted with
 
-- <1> PCA, when $d=200$ and $n=400$: =a) 100, b) 200, c) 400 and d) 3=.
-- <2> PCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 3=.
-- <3> FDA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 3=.
-- <4> KPCA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 3=.
-- <5> KPCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 3=.
+- <1> PCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 2=.
+- <2> PCA, when $d=200$ and $n=400$: =a) 100, b) 200, c) 400 and d) 2=.
+- <3> FDA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 2=.
+- <4> KPCA, when $d=200$ and $n=400$:  =a) 100, b) 200, c) 400 and d) 2=.
+- <5> KPCA, when $d=200$ and $n=100$:  =a) 100, b) 200, c) 400 and d) 2=.
 - <6> FFFS, when $d=200$ and $n=100$:  =a) 2, b) 7, c) 15 and d) 200=.
 - <7> FFFS, when $d=200$ and $n=400$:  =a) 2, b) 7, c) 15 and d) 200=.
 
@@ -974,7 +974,7 @@ import scipy as sp
 def numOfParameter(d,c):
     return c*d*(d+3)/2+c-1
 
-n = 400
+n = 100
 d = 1
 c = 3
 
@@ -985,7 +985,7 @@ return d
 #+END_SRC
 
 #+RESULTS:
-: 15
+: 7
 *** KPCA
 #+BEGIN_SRC python :exports none
 import scipy as sp
