@@ -2,7 +2,7 @@
 #+SUBTITLE: GRSS Summer School
 #+AUTHOR: Mathieu Fauvel
 #+EMAIL: mathieu.fauvel@ensat.fr
-#+DATE: [2017-04-26 Wed 10:30-12:00]
+#+DATE: [2017-04-26 Wed]--[2017-04-27 Thu]
 
 #+INCLUDE_TAGS: export
 #+EXCLUDE_TAGS: noexport

@@ -12,9 +12,10 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearc
 from sklearn.metrics import f1_score
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.decomposition import PCA
+from sklearn.model_selection import cross_val_score
 
 # Parameters
-NB = 50
+NB = 60
 
 # Load data
 im,GeoT,Proj = rt.open_data('../Data/university.tif')
@@ -44,5 +45,18 @@ for i in xrange(1,NB+1):
 
 # Plot accuracies function of the cummulative variance
 plt.plot(cl[1:],F1[1:])
-plt.axis([0.9, 1, 0.7, 1])
+plt.axis([0.95, 1, 0.7, 1])
+plt.show()
+
+# Find the optimal number of components with CV
+F1e = []
+for i in xrange(1,NB+1):
+    print("Number of PCs {}".format(i))
+    clf = QuadraticDiscriminantAnalysis()
+    scores = cross_val_score(clf, X_train[:,:i], y_train, cv=5, scoring='f1_weighted')
+    F1e.append(scores.mean())
+
+# Plot accuracies function of the cummulative variance
+plt.plot(cl[1:],F1e[1:])
+plt.axis([0.95, 1, 0.7, 1])
 plt.show()

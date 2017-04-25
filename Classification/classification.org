@@ -2,7 +2,7 @@
 #+SUBTITLE: GRSS Summer School
 #+AUTHOR: Mathieu Fauvel
 #+EMAIL: mathieu.fauvel@ensat.fr
-#+DATE: [2017-04-26 Wed 13:30-16:00]
+#+DATE: [2017-04-26 Wed]--[2017-04-27 Thu]
 
 #+INCLUDE_TAGS: export
 #+EXCLUDE_TAGS: noexport
@@ -11,7 +11,7 @@
 
 #+COLUMNS: %40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM
 
-#+LaTeX_CLASS_OPTIONS: [10pt,aspectratio=1610]
+#+LaTeX_CLASS_OPTIONS: [10pt,aspectratio=1610,,color={dvipsnames,usenames,table},table]
 
 #+BEAMER_THEME: DarkConsole
 #+BEAMER_HEADER: \institute{UMR Dynafor}
@@ -26,7 +26,7 @@
 #+LATEX_HEADER: \usepackage{pgfplots,pgfplotstable}\usetikzlibrary{pgfplots.groupplots}\usepackage[babel=true,kerning=true]{microtype}\usepackage{smartdiagram}
 #+LATEX_HEADER: \addbibresource{class.bib}
 #+LATEX_HEADER: \usetikzlibrary{mindmap,trees,shapes,arrows,spy,3d,decorations.pathmorphing,pgfplots.statistics,pgfplots.dateplot}
-#+LATEX_HEADER: \pgfplotsset{compat=newest}
+#+LATEX_HEADER: \pgfplotsset{compat=newest}\usepackage{colortbl}\usepackage{multirow}
 
 #+LATEX_HEADER: \hypersetup{colorlinks,linkcolor=,urlcolor=magenta}
   
@@ -80,6 +80,78 @@
 :END:
 #+ATTR_LATEX: :width 0.55\textwidth
 [[file:./figures/university_gt.png]]
+*** Confusion matrix 1/2
+#+BEGIN_EXPORT latex
+\textbf{Confusion Matrix}: Compute the agreement between the classifier and the reference data.
+  \vspace{0.25cm}
+  
+  \centerline{\begin{tabular}{cc}
+      \begin{tabular}{|c|c|c|c|}
+        \hline
+        \cellcolor{green} V & \cellcolor{green} V & \cellcolor{brown} F& \cellcolor{brown} F\\
+        \hline
+        \cellcolor{green} V & \cellcolor{green} V & \cellcolor{brown} F& \cellcolor{blue} E \\
+        \hline
+        \cellcolor{green} V & \cellcolor{brown} F & \cellcolor{blue} E& \cellcolor{blue} E \\
+        \hline
+        \cellcolor{green} V & \cellcolor{green} V & \cellcolor{blue} E& \cellcolor{blue} E \\
+        \hline
+        \end{tabular} &
+        \begin{tabular}{|c|c|c|c|}
+        \hline
+        \cellcolor{green} V & ~ & ~ & \cellcolor{brown} F\\
+        \hline
+        \cellcolor{green} V &\cellcolor{brown} F & ~ & ~\\
+        \hline
+        ~ & ~ & \cellcolor{blue} E &\cellcolor{blue} E\\
+        \hline
+        ~ & ~ & \cellcolor{green} V & ~\\
+        \hline
+        \end{tabular}\\
+        Classification & Reference data
+    \end{tabular}}
+  \vspace{0.5cm}
+
+  Construction :
+  \centerline{\begin{tabular}{c|c|ccc|}
+      \multicolumn{1}{c}{~} &  \multicolumn{4}{c}{Reference data}\\
+      \cline{2-5}
+      \multirow{4}{*}{\rotatebox{90}{Classification}}&  & V & F & E\\
+      \cline{2-5}
+      & V &\only<2-3>{1}\only<4->{2} & \only<5->{1} &\only<9>{0} \\
+      & F &\only<9>{0} &\only<3->{1} &\only<9>{0} \\
+      & E & \only<8->{1} &\only<9>{0} & \only<6>{1}\only<7->{2}\\
+      \cline{2-5}
+      \end{tabular}}
+#+END_EXPORT
+*** Confusion matrix 2/2
+#+BEGIN_EXPORT latex
+ \centerline{\begin{tabular}{c|c|ccc|c}
+      \multicolumn{1}{c}{~} &  \multicolumn{4}{c}{Reference data}\\
+      \cline{2-5}
+      \multirow{4}{*}{\rotatebox{90}{Classification}}&  & 1 & \ldots & C\\
+      \cline{2-5}
+      & 1 &$n_{11}$ & \ldots &$n_{1C}$ &$p_1^{ppv}$\\
+      & \vdots &\vdots &$\ddots$ & & \vdots\\
+      & C &  $n_{C1}$& &$n_{CC}$ & $p_C^{ppv}$\\
+      \cline{2-5}
+      \multicolumn{2}{c}{~}&$p_1^{tpr}$ & \ldots& \multicolumn{1}{c}{$p_C^{tpr}$} \\
+    \end{tabular}}
+  \vspace{0.25cm}
+  #+END_EXPORT
+
+- Overall accuracy: $\dfrac{\sum_{i=1}^Cn_{ii}}{n}$
+- True  positive rate (tpr) : Percentage  of pixels  of the  reference data
+  belonging to class $i$ that are correctly classified to class \(i\).
+  $$p^{tpr}_i=\dfrac{n_{ii}}{\sum_{j=1}^Cn_{ji}}$$
+
+- Positive predicted value (ppv):  Percentage of pixels classified  to class \(i\)
+    that belong actually to class \(i\) in the reference data.
+  $$p^{ppv}_i=\dfrac{n_{ii}}{\sum_{j=1}^Cn_{ij}}$$
+
+- F1 score of class \(i\): 
+  $$\text{F1}_{i} = 2\frac{1}{1/{p^{tpr}_i} +1/{p^{ppv}_i}}$$
+
 * Introductory examples                                              :export:
 ** Influence of the number of samples
 *** Experimental set-up

@@ -1,4 +1,4 @@
-% Created 2017-04-24 Mon 11:12
+% Created 2017-04-25 Tue 17:31
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,aspectratio=1610]{beamer}
 \usepackage[utf8]{inputenc}
@@ -35,7 +35,7 @@
 \definecolor{c12}{rgb}{0.5,0,0}
 \usetheme{DarkConsole}
 \author{Mathieu Fauvel}
-\date{\textit{[2017-04-26 Wed 08:30]--[2017-04-26 Wed 10:00]}}
+\date{\textit{[2017-04-26 Wed]--[2017-04-27 Thu]}}
 \title{Introduction to hyperspectral remote sensing imagery}
 \subtitle{GRSS Summer School}
 \institute{UMR Dynafor}
@@ -50,7 +50,7 @@
 \tableofcontents
 \end{frame}
 
-\begin{frame}[label={sec:org5ad7d50}]{Mathieu Fauvel}
+\begin{frame}[label={sec:orga1c4676}]{Mathieu Fauvel}
 \begin{center}
 \begin{tabular}{ccc}
   \includegraphics[width=0.3\linewidth]{figures/logo-INRA-transp.png}
@@ -78,8 +78,8 @@
 \end{itemize}
 \end{frame}
 \section{Introduction}
-\label{sec:orged475bc}
-\begin{frame}[label={sec:org70bcf6f}]{Remote sensing}
+\label{sec:org3b19bac}
+\begin{frame}[label={sec:org2585f6d}]{Remote sensing}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -101,7 +101,7 @@ usually formated in terms of \emph{digital image data}.
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[fragile,label={sec:org77a89d7}]{Fields of application}
+\begin{frame}[fragile,label={sec:orgabd1371}]{Fields of application}
 \tikzset{grow cyclic list/.code={%
   \def\tikzgrowthpositions{{#1}}%
   \foreach \n [count=\i,remember=\i]in {#1}{}%
@@ -148,7 +148,7 @@ usually formated in terms of \emph{digital image data}.
     \end{tikzpicture}}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0ea3755}]{Hekla Volcano, Iceland}
+\begin{frame}[label={sec:orgc2a0588}]{Hekla Volcano, Iceland}
 \begin{columns}
 \begin{column}{0.45\columnwidth}
 \begin{center}
@@ -168,10 +168,10 @@ usually formated in terms of \emph{digital image data}.
 \end{frame}
 
 \section{Hyperspectral imagery}
-\label{sec:org699efba}
+\label{sec:orgfeab3a5}
 \subsection{Element of physics}
-\label{sec:org80ad24c}
-\begin{frame}[label={sec:org56dfdc4}]{Electromagnetic wave}
+\label{sec:org2aafa12}
+\begin{frame}[label={sec:orgc3b45d4}]{Electromagnetic wave}
 \begin{center}
 \begin{tikzpicture}[samples=100]
   \filldraw[domain=0:2*pi,color=blue,fill=blue!30] plot (\x,0,{2*sin(\x*2 r)});
@@ -202,14 +202,14 @@ usually formated in terms of \emph{digital image data}.
 \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org0ba0602}]{Electromagnetic spectrum}
+\begin{frame}[label={sec:org3614284}]{Electromagnetic spectrum}
 \begin{center}
 \includegraphics[angle=-1,width=0.8\linewidth]{./figures/spectralInformation.pdf}
 \end{center}
 
 From \cite{manolakis2016hyperspectral}.
 \end{frame}
-\begin{frame}[label={sec:orgdfbf913}]{Spectral reflectance}
+\begin{frame}[label={sec:orgb12dd05}]{Spectral reflectance}
 \alert{Reflectance}: 
 \begin{itemize}
 \item Capacity of a given surface to reflect the incident light,
@@ -238,7 +238,7 @@ From \cite{manolakis2016hyperspectral}.
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org5c4744c}]{Spectral reflectance curves}
+\begin{frame}[label={sec:org43d5dd9}]{Spectral reflectance curves}
 \alert{Spectral reflectance curves or spectral signature}: Radiometric identity card
 
 \begin{center}
@@ -256,8 +256,8 @@ From \cite{manolakis2016hyperspectral}.
 \end{center}
 \end{frame}
 \subsection{Digital remote sensing images}
-\label{sec:orgbb73aea}
-\begin{frame}[label={sec:org0f9aa03}]{Remote sensing images}
+\label{sec:org461de43}
+\begin{frame}[label={sec:org1660bde}]{Remote sensing images}
 \emph{A  remote sensing  image  is a  sampling of  a  spatial, spectral  and
 temporel process}.
 
@@ -291,7 +291,7 @@ temporel process}.
     \end{tikzpicture}
   \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgf440330}]{Characteristics of remote sensing images}
+\begin{frame}[label={sec:orgb308d14}]{Characteristics of remote sensing images}
 \begin{itemize}
 \item Spatial resolution: \emph{Ability to distinguish two closed objects}.
 \begin{center}
@@ -338,7 +338,7 @@ Ultraspectral & > 1000\\
 spatial \emph{and} spectral resolution at the same time.
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org40ee4bb}]{Multispectral versus hyperspectral}
+\begin{frame}[label={sec:orgf2356a5}]{Multispectral versus hyperspectral}
 \begin{center}
 \begin{tikzpicture}[]
   \begin{axis}[,xmin=0.4,xmax=2.56,ymin=0,ymax=0.6,grid=both,width=0.9\linewidth,height=0.8\textheight,title=Pleiade versus Hypxim]
@@ -350,7 +350,7 @@ spatial \emph{and} spectral resolution at the same time.
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgd79589c}]{Hyperspectral sensors}
+\begin{frame}[label={sec:org2e3a803}]{Hyperspectral sensors}
 \begin{center}
   \begin{tikzpicture}
   \begin{semilogxaxis}[grid=both,xlabel= \small Spatial resolution (in meters per pixel),ylabel=\small Number of spectral channels,legend style={cells={anchor=east},legend pos=outer north east,},width=0.9\linewidth,height=0.95\textheight,xmax=1300,ymin=0,ymax=320,every node near coord/.append style={font=\small}]      
@@ -361,8 +361,8 @@ spatial \emph{and} spectral resolution at the same time.
 \end{center}
 \end{frame}
 \subsection{Spectral signatures}
-\label{sec:org52a91d1}
-\begin{frame}[label={sec:org1e1bfb3}]{Vegetation 1/2}
+\label{sec:orgbfa5589}
+\begin{frame}[label={sec:orgf412f93}]{Vegetation 1/2}
 Healthy vegetation (high photosynthesis)
 \begin{itemize}
 \item Absorption in \emph{blue} and \emph{red} domain,
@@ -374,7 +374,7 @@ Healthy vegetation (high photosynthesis)
 \includegraphics[width=0.5\linewidth]{./figures/spectral_curve_vegetation.jpg}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org048c017}]{Vegetation 2/2}
+\begin{frame}[label={sec:orgd20339d}]{Vegetation 2/2}
 \begin{columns}
 \begin{column}{0.35\columnwidth}
 Factor modifying the reflectance
@@ -402,7 +402,7 @@ Factor modifying the reflectance
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgfb57782}]{Water}
+\begin{frame}[label={sec:orge62f78a}]{Water}
 \begin{center}
   \begin{tikzpicture}
     \begin{axis}[xmin=400,xmax=2500,ymin=0,ymax=0.1,grid,xlabel=$\lambda~({\mu}m)$,ylabel=Reflectance,width=0.9\linewidth,height=0.5\linewidth,cycle list name=color list,/pgf/number format/1000 sep={},/pgf/number format/fixed,]
@@ -431,7 +431,7 @@ Factor modifying the reflectance
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:org17a56d8}]{Human made materials}
+\begin{frame}[label={sec:org1bb2ecf}]{Human made materials}
 \begin{center}
   \begin{tikzpicture}
     \pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
@@ -448,10 +448,10 @@ Factor modifying the reflectance
 \end{center}
 \end{frame}
 \section{Current challenges in hyperspectral}
-\label{sec:orgee1b1f6}
+\label{sec:orgfdb4a82}
 \subsection{What is remote sensing made of ?}
-\label{sec:org16913a6}
-\begin{frame}[label={sec:orgfe43285}]{An interdisciplinary field}
+\label{sec:org0c0a8b8}
+\begin{frame}[label={sec:orgf98e6a8}]{An interdisciplinary field}
 \begin{center}
 \smartdiagramset{planet color=orange!60,
 distance planet-satellite=4cm
@@ -460,7 +460,7 @@ distance planet-satellite=4cm
 {\textsc{Hyperspectral}\\ \textsc{Remote Sensing},Computer \\Science,Signal and Image \\ Processing, Pattern \\Recognition, Physics, Environemental\\ Science}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgd39d455}]{Processing chain}
+\begin{frame}[label={sec:orgb402063}]{Processing chain}
 \smartdiagramset{uniform sequence color=true,
 sequence item border color=black,sequence item font size=\small,
 sequence item text color=white,sequence item text width=2.75cm
@@ -489,7 +489,7 @@ sequence item text color=white,sequence item text width=2.75cm
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org13c8377}]{Hot topics}
+\begin{frame}[label={sec:orge4d3078}]{Hot topics}
 \begin{center}
   \begin{tikzpicture}
     \begin{axis}[date coordinates in=x,xtick=data, ybar,title=Number of published papers per year about "hyperspectral remote sensing" (\emph{ISI Web of science}),width=0.9\linewidth,height=0.9\textheight,grid=both,date ZERO=1999-09-01,xmin=1999-09-01,xmax=2016-05-01,xticklabel style={rotate=45},xticklabel={\year},ymin=0,ymax=800]
@@ -516,8 +516,8 @@ sequence item text color=white,sequence item text width=2.75cm
 \end{center}
 \end{frame}
 \subsection{Current challenges}
-\label{sec:orgade0609}
-\begin{frame}[label={sec:org8565c00}]{Challenges}
+\label{sec:org29e7aad}
+\begin{frame}[label={sec:org33b16dc}]{Challenges}
 \begin{itemize}
 \item \uline{Pattern recognition}:
 \begin{itemize}
@@ -539,7 +539,7 @@ sequence item text color=white,sequence item text width=2.75cm
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org1f7f6ef}]{Spectral variability}
+\begin{frame}[label={sec:orga5bc28b}]{Spectral variability}
 \begin{center}
   \begin{tikzpicture}
     \begin{axis}[grid=both,width=\linewidth,height=0.5\linewidth,xmin=350,xmax=2400,ymin=0,ymax=0.5,mark=none,/pgf/number format/1000 sep={},/pgf/number format/fixed,thick,ticklabel style = {font=\footnotesize},title=Grasslands measurements]
@@ -572,8 +572,8 @@ sequence item text color=white,sequence item text width=2.75cm
 \end{center}
 \end{frame}
 \subsection{High dimensional data}
-\label{sec:org30be812}
-\begin{frame}[label={sec:org39ee5f3}]{Properties of HD spaces 1/3}
+\label{sec:org5e03fad}
+\begin{frame}[label={sec:org1c49d1d}]{Properties of HD spaces 1/3}
 \begin{itemize}
 \item High number of measurements \(d\) but limited number \(n\) of samples.
 \item High dimensional space do not behave as low/moderate dimensional space \cite{661089}:
@@ -605,7 +605,7 @@ sequence item text color=white,sequence item text width=2.75cm
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:orgc4c7e73}]{Properties of HD spaces 2/3}
+\begin{frame}[label={sec:org8ebff66}]{Properties of HD spaces 2/3}
 Consider                                                             a
 r.v.      \(\mathbf{x}\sim\mathcal{N}(\mathbf{0},\mathbf{I})\).      The
 likelihood of \(t=\|\mathbf{x}\|\) is given by
@@ -631,7 +631,7 @@ which is maximum for \(t^*=\sqrt{d-1}\) \cite{661089}.
 \end{center}
 \end{frame}
 
-\begin{frame}[label={sec:org76f7bef}]{Properties of HD spaces 3/3}
+\begin{frame}[label={sec:orgaa19aab}]{Properties of HD spaces 3/3}
 \begin{itemize}
 \item \alert{Concentration of measure} phenomenon \cite{Aggarwal2001}: if \(\mathbf{x}\) r.v. with i.i.d variables
 $$ \frac{d_M(\mathbf{x})-d_m(\mathbf{x})}{d_M(\mathbf{x})}\to_{p} 0$$
@@ -644,7 +644,7 @@ for all Minkowski norm: \(\|\mathbf{x}\|=\big(\sum_{i=1}^{d}|x_i|^{p} \big)^{1/p
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orga9d868f}]{Consequences for the analysis}
+\begin{frame}[label={sec:org4f1acfe}]{Consequences for the analysis}
 \begin{itemize}
 \item Curse of dimensionality: Number of points to uniformly sample a unit hypercube (step=0.1)
   \begin{center}
@@ -671,8 +671,8 @@ value.}"
 \end{itemize}
 \end{frame}
 \section{Questions}
-\label{sec:org87856ac}
-\begin{frame}[label={sec:org4f480de}]{Is there a fake ?}
+\label{sec:org97ca70b}
+\begin{frame}[label={sec:orgd125bdb}]{Is there a fake ?}
 \begin{onlyenv}<1>
 \begin{center}
 \includegraphics[width=0.9\linewidth]{./figures/demo.pdf}
@@ -710,7 +710,7 @@ value.}"
 \end{onlyenv}
 \end{frame}
 
-\begin{frame}[label={sec:org73f916a}]{Spectra}
+\begin{frame}[label={sec:org00af0f9}]{Spectra}
 \pgfplotstableread{figures/cotton_spectra.txt}\loadedtable
 \begin{center}
 \begin{tikzpicture}\begin{axis}[xlabel=$\lambda$, ylabel=Reflectance,  xmin=0.4, xmax=2.5, ymin=0,   ymax=1, grid=both,width=0.9\textwidth, height=0.4\textwidth]
@@ -726,7 +726,7 @@ value.}"
 There are two spectra of the same material (cotton), before and after drying. Which are they ?
 \end{frame}
 
-\begin{frame}[label={sec:org5560f7c}]{Gaussian distribution}
+\begin{frame}[label={sec:org694b0e4}]{Gaussian distribution}
 What is the number of parameters to estimate for a Gaussian distribution
 
 \begin{itemize}
@@ -745,11 +745,11 @@ What is the number of parameters to estimate for a Gaussian distribution
 \end{block}
 \end{frame}
 \section{References}
-\label{sec:org9f93bb7}
+\label{sec:org97b9df8}
 \begin{frame}[fragile,allowframebreaks,label=]{Bibliography}
 \printbibliography
 \end{frame}
-\begin{frame}[label={sec:org03a0d22}]{}
+\begin{frame}[label={sec:org479e03b}]{}
 \begin{center}
 \tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
 \normalsize

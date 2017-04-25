@@ -1,4 +1,4 @@
-% Created 2017-04-24 Mon 12:17
+% Created 2017-04-25 Tue 17:51
 % Intended LaTeX compiler: pdflatex
 \documentclass[10pt,aspectratio=1610]{beamer}
 \usepackage[utf8]{inputenc}
@@ -24,7 +24,7 @@
 \hypersetup{colorlinks,linkcolor=,urlcolor=magenta}
 \usetheme{DarkConsole}
 \author{Mathieu Fauvel}
-\date{\textit{[2017-04-26 Wed 10:30]--[2017-04-26 Wed 12:00]}}
+\date{\textit{[2017-04-26 Wed]--[2017-04-27 Thu]}}
 \title{Feature Extraction}
 \subtitle{GRSS Summer School}
 \institute{UMR Dynafor}
@@ -40,8 +40,8 @@
 \end{frame}
 
 \section{Motivations}
-\label{sec:orge5e0c13}
-\begin{frame}[label={sec:orgb1bcf0a}]{Illustration}
+\label{sec:org12c2458}
+\begin{frame}[label={sec:org2ec5396}]{Illustration}
 \begin{itemize}
 \item <1-> \alert{Curse of dimensionality}: it is not possible to get enough data to cover all the observation space.
 \begin{center}
@@ -63,7 +63,7 @@
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org51515ee}]{Application}
+\begin{frame}[label={sec:org60ebfcb}]{Application}
 \begin{itemize}
 \item Feature extraction is important in remote sensing because:
 \begin{itemize}
@@ -89,10 +89,10 @@
 \end{frame}
 
 \section{Physical Indices}
-\label{sec:org31406aa}
+\label{sec:orgdf267c4}
 \subsection{Introduction}
-\label{sec:orga8518c6}
-\begin{frame}[label={sec:orgf312fe3}]{Spectral indices}
+\label{sec:org98b04e8}
+\begin{frame}[label={sec:orgedfe282}]{Spectral indices}
 \begin{itemize}
 \item Spectral indices are a linear/non-linear combination of two (or more) spectral bands.
 \item They provides information as a \emph{single number} about:
@@ -119,7 +119,7 @@ Soil-adjusted vegetation index & \((1+L)\times\dfrac{R_{\lambda_1} - R_{\lambda_
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgb2724e5}]{Conventional Indices}
+\begin{frame}[label={sec:org655086b}]{Conventional Indices}
 Index database : \url{http://www.indexdatabase.de/}
 
 \begin{center}
@@ -143,8 +143,8 @@ Soil Brightness Index & \(0.406R_{\lambda{550}}+0.600R_{\lambda{650}}+0.645R_{\l
 \end{frame}
 
 \subsection{Vegetation Indices}
-\label{sec:org73526bb}
-\begin{frame}[label={sec:orgf8c4f62}]{Normalized difference vegetation index}
+\label{sec:org38c14f4}
+\begin{frame}[label={sec:org4e22d7b}]{Normalized difference vegetation index}
 $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + R_{\lambda_{670}}}$$
 \begin{itemize}
 \item \(-1\leq \text{NVDI} \leq 1\)
@@ -168,8 +168,8 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{center}
 \end{frame}
 \subsection{Case study}
-\label{sec:org13c429c}
-\begin{frame}[label={sec:orgb863a8f}]{University of Pavia}
+\label{sec:org2457f8d}
+\begin{frame}[label={sec:orged68570}]{University of Pavia}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -189,7 +189,7 @@ $$\text{NDVI}=\dfrac{R_{\lambda_{800}} - R_{\lambda_{670}}}{R_{\lambda_{800}} + 
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org019358c}]{Orfeo-Toolbox}
+\begin{frame}[fragile,label={sec:org764159f}]{Orfeo-Toolbox}
  \begin{itemize}
 \item \href{https://www.orfeo-toolbox.org/}{OTB} is a C++ library for remote sensing images processing.
 \item It is free, open-source and available for most OS (window, apple, linux)
@@ -209,7 +209,7 @@ otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orge1df511}]{University of Pavia - Spectral Indices}
+\begin{frame}[label={sec:org35d7684}]{University of Pavia - Spectral Indices}
 \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{center}
@@ -231,7 +231,7 @@ otbcli_BandMath -il ../Data/university.tif -out ../Data/university_sbi.tif \
 \end{columns}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org7c91491}]{Where is the vegetation 1/2 ?}
+\begin{frame}[fragile,label={sec:org789e9d4}]{Where is the vegetation 1/2 ?}
    \begin{center}
   \begin{tikzpicture}
     \begin{axis}[grid=both,width=0.95\linewidth,height=0.45\linewidth,/pgf/number format/1000 sep={},/pgf/number format/fixed,title=Density plot of the NDVI,xmin=-0.6,xmax=1,ymin=0,ymax=0.01]
@@ -249,7 +249,7 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org4a7864a}]{Where is the vegetation 2/2 ?}
+\begin{frame}[label={sec:org7e77085}]{Where is the vegetation 2/2 ?}
 \begin{columns}
 \begin{column}{0.5\columnwidth}
 \begin{center}
@@ -266,8 +266,8 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 \end{frame}
 
 \subsection{Question}
-\label{sec:orgebc647a}
-\begin{frame}[label={sec:org8a5280a}]{Could you find the good one ?}
+\label{sec:orgf3343b2}
+\begin{frame}[label={sec:org2ea5f80}]{Could you find the good one ?}
  \centerline{\begin{tabular}{cc}
     \includegraphics[width=0.4\linewidth]{figures/image1.jpg} & \begin{tikzpicture}\pgfplotsset{every axis legend/.append style={at={(0.5,1.03)},anchor=south}}
       \begin{axis}[ytick=\empty,xmin=-0.5,xmax=0.9,ymin=0,width=0.5\linewidth,axis y line=center,axis x line=bottom,legend columns=4]
@@ -289,10 +289,10 @@ otbcli_BandMath -il ../Data/university_ndvi.tif -out ../Data/university_ndvi_seg
 From the histogram, which one does correspond to the NDVI of the image ?
 \end{frame}
 \section{Statistical Feature Extraction}
-\label{sec:orgc4084e6}
+\label{sec:orgaf77cec}
 \subsection{Unsupervised}
-\label{sec:org3182a35}
-\begin{frame}[label={sec:orgd5fd74c}]{Principal Components Analysis}
+\label{sec:org4cef40b}
+\begin{frame}[label={sec:org3859b61}]{Principal Components Analysis}
 \begin{itemize}
 \item Linear transformation used to reduce the dimensionality of the data \cite{jolliffe2002principal}.
 $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
@@ -315,7 +315,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
   \end{tikzpicture}
 \end{center}
 \end{frame}
-\begin{frame}[label={sec:orgd816951}]{Maximization of the variance 1/2}
+\begin{frame}[label={sec:org107c944}]{Maximization of the variance 1/2}
 \begin{itemize}
 \item <1-> Search \(\mathbf{v}_1\) such as \(\max\text{var}(z_1)\):
 \begin{eqnarray*}
@@ -341,7 +341,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
 \end{eqnarray*}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgd6c5f02}]{Maximization of the variance 2/2}
+\begin{frame}[label={sec:org77f1e4c}]{Maximization of the variance 2/2}
 \begin{itemize}
 \item <1-> Search \(\mathbf{v}_2\) such as \(\max\text{var}(z_2)\) and \(\langle\mathbf{v}_2,\mathbf{v}_2\rangle=1\) and \(\langle\mathbf{v}_1,\mathbf{v}_2\rangle=0\)
 \item <2-> Lagrangian:
@@ -367,7 +367,7 @@ $$ z_i = \langle\mathbf{v}_i,\mathbf{x}\rangle$$
 \item <7-> \(\mathbf{v}_k\) is the eigenvector corresponding the \emph{\(k^{\text{th}}\) largest} eigenvalues
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgbeae366}]{PCA in practice}
+\begin{frame}[label={sec:org9f31f75}]{PCA in practice}
 \begin{enumerate}
 \item Empirical estimation the mean value:
 \begin{eqnarray*}
@@ -382,7 +382,7 @@ $$\frac{\sum_{i=1}^p\lambda_i}{\sum_{i=1}^d\lambda_i}$$
 \item Tips for high dimensional data set: if \(n<d\) see \cite{manolakis2016hyperspectral} page 420
 \end{enumerate}
 \end{frame}
-\begin{frame}[fragile,label={sec:org09cfa51}]{PCA case study 1/3}
+\begin{frame}[fragile,label={sec:org1b8c1b4}]{PCA case study 1/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
@@ -405,7 +405,7 @@ sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org374474f}]{PCA case study 2/3}
+\begin{frame}[label={sec:orgf14e2e3}]{PCA case study 2/3}
 \begin{itemize}
 \item Explained variance
 \begin{center}
@@ -431,7 +431,7 @@ sp.savetxt('../FeatureExtraction/figures/pca_pcs.csv',D,delimiter=',')
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:org1d1417e}]{PCA case study 3/3}
+\begin{frame}[fragile,label={sec:org38e5968}]{PCA case study 3/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 # Projection of the first PCs
 imp = sp.dot(im,pca.components_[:3,:].T)
@@ -455,7 +455,7 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org9079873}]{Kernel PCA}
+\begin{frame}[label={sec:orgc53725b}]{Kernel PCA}
 \begin{itemize}
 \item PCA is limited to second order information
 \item To capture higher-order statistics, it is possible to map the data onto another space \(\mathcal{H}\)
@@ -522,7 +522,7 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgb839101}]{Kernel PCA in practice}
+\begin{frame}[label={sec:org72f0c03}]{Kernel PCA in practice}
 \begin{itemize}
 \item Choose the kernel and its parameters
 \item Compute the kernel matrix \(\mathbf{K}\) for all the pixels (or a subset)
@@ -541,7 +541,7 @@ rt.write_data('../Data/pca_university.tif',imp,GeoT,Proj)
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org948e42e}]{KPCA case study 1/3}
+\begin{frame}[fragile,label={sec:orgf4dbcb5}]{KPCA case study 1/3}
  From \cite{fauvel2009kernel}.
 
 \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
@@ -566,7 +566,7 @@ kpca = KernelPCA(kernel='rbf',gamma=1.0/b,n_jobs=-1)
 kpca.fit(im[::50,:]) # Use a subset of the total number of pixels
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:org993b0b4}]{KPCA case study 2/3}
+\begin{frame}[label={sec:org7f7bb63}]{KPCA case study 2/3}
 \begin{itemize}
 \item Explained variance
 \begin{center}
@@ -610,7 +610,7 @@ kpca.fit(im[::50,:]) # Use a subset of the total number of pixels
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:orgcb8815d}]{KPCA case study 3/3}
+\begin{frame}[fragile,label={sec:org510c811}]{KPCA case study 3/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 imp = kpca.transform(im)[:,:3]
 imp.shape = (h,w,3)
@@ -634,8 +634,8 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
 \end{frame}
 
 \subsection{Supervised}
-\label{sec:org5ec4754}
-\begin{frame}[label={sec:org39c4e4e}]{Fisher's Discriminant Analysis}
+\label{sec:orge0a66f6}
+\begin{frame}[label={sec:org8dec193}]{Fisher's Discriminant Analysis}
 \begin{itemize}
 \item We observe some \(\{\mathbf{x}_i,y_i\}_{i=1}^n\)
 \item Use the label information to find the linear features that highlight differences among classes
@@ -651,7 +651,7 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
 \item FDA: find \(\mathbf{a}\) such as the ratio between the \emph{between projected variance} and the \emph{sample projected variance} is maximal \cite{manolakis2016hyperspectral} Chap. 8.8
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:org6eba83d}]{FDA Algorithm}
+\begin{frame}[label={sec:org8209be7}]{FDA Algorithm}
 \begin{itemize}
 \item Between-class covariance matrix:
 \begin{eqnarray*}
@@ -669,7 +669,7 @@ rt.write_data('../Data/kpca_university.tif',imp,GeoT,Proj)
 \item Remark: there are at most \(C-1\) eigenvectors because \(\text{Rank}(\mathbf{B})\leq C-1\).
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:org76eca26}]{FDA case study 1/3}
+\begin{frame}[fragile,label={sec:org85bc0fa}]{FDA case study 1/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
@@ -697,7 +697,7 @@ lda = LinearDiscriminantAnalysis(solver='eigen',shrinkage='auto')
 lda.fit(xt,yt.ravel())
 \end{minted}
 \end{frame}
-\begin{frame}[label={sec:orga4ecd21}]{FDA case study 2/3}
+\begin{frame}[label={sec:org1cabe74}]{FDA case study 2/3}
 \begin{itemize}
 \item Projection on Fisher components
 \begin{center}
@@ -727,7 +727,7 @@ lda.fit(xt,yt.ravel())
 \end{center}
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:org2fad40c}]{FDA case study 3/3}
+\begin{frame}[fragile,label={sec:orgf9f1fec}]{FDA case study 3/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 im,GeoT,Proj = rt.open_data('../Data/university.tif')
 [h,w,b]=im.shape
@@ -752,7 +752,7 @@ rt.write_data('../Data/lda_university.tif',imp,GeoT,Proj)
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org90a7cad}]{Feature selection}
+\begin{frame}[label={sec:orgc06e92e}]{Feature selection}
 \begin{itemize}
 \item Feature selection: pick few features \emph{from} the original ones (no combination)
 \item In general, for feature selection, we need:
@@ -776,7 +776,7 @@ Classification error & Forward search/GA & \cite{lebris:fs,7847352}\\
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:orgbed31a7}]{Large scale feature selection with GMM}
+\begin{frame}[label={sec:org7699ab5}]{Large scale feature selection with GMM}
 \begin{itemize}
 \item Fast  forward strategy  based  on  a nonlinear  model  driven by  an
 estimate of the classification error or a measure of separability:
@@ -799,7 +799,7 @@ Jeffries-Matusita distance & Divergence & Low\\
 \end{itemize}
 \end{frame}
 
-\begin{frame}[label={sec:org038312e}]{Algorithm 1/2}
+\begin{frame}[label={sec:orga330356}]{Algorithm 1/2}
 The forward feature selection works as follow:
 \begin{enumerate}
 \item Starts with an empty pool \(F\) of selected features,
@@ -816,7 +816,7 @@ low or if the maximum number of features is reached.
 \end{enumerate}
 \end{frame}
 
-\begin{frame}[label={sec:orgb65ad22}]{Algorithm 2/2}
+\begin{frame}[label={sec:orgb4b2445}]{Algorithm 2/2}
 \tikzset{noeud/.style={minimum width=1.5cm,minimum height=1cm,text width = 1.25cm,text centered,rounded corners=1pt,draw,rectangle,thick}}
 \tikzstyle{arrow}=[->,>=stealth,thick]
 \tikzstyle{arrow2}=[dashed,->,>=stealth,thick]
@@ -849,7 +849,7 @@ low or if the maximum number of features is reached.
 \end{tikzpicture}}}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org900d087}]{FFFS case study 1/3}
+\begin{frame}[fragile,label={sec:org516da02}]{FFFS case study 1/3}
  \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{python}
 import rasterTools as rt
 import scipy as sp
@@ -880,7 +880,7 @@ idx, crit, [] = model.selection('forward',xt, yt,criterion='kappa', varNb=maxVar
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:orgee584ff}]{FFFS case study 2/3}
+\begin{frame}[label={sec:org881dc06}]{FFFS case study 2/3}
 \begin{itemize}
 \item Criterion
   \begin{center}
@@ -915,8 +915,8 @@ idx, crit, [] = model.selection('forward',xt, yt,criterion='kappa', varNb=maxVar
 \end{frame}
 
 \subsection{Questions}
-\label{sec:orgf42e34a}
-\begin{frame}[fragile,label={sec:orgfffaf73}]{Number of features}
+\label{sec:org9b4a07c}
+\begin{frame}[fragile,label={sec:org1ab2d4c}]{Number of features}
  Given         a         set         of         observed         pixels
 \(\mathcal{S}=\{(\mathbf{x}_i,y_i)\}_{i=1}^n\)                       and
 \(\mathbf{x}\in\mathbb{R}^{d}\). The number of classes \(C\) is \(3\).  What
@@ -933,7 +933,7 @@ is the \emph{maximum} number of features that can be extracted with
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile,label={sec:org55246d8}]{KPCA}
+\begin{frame}[fragile,label={sec:org9c92dbb}]{KPCA}
  \begin{itemize}
 \item Given the following data set, using the Gaussian kernel, how do you expect KPCA will behave: 
 
@@ -976,14 +976,14 @@ is the \emph{maximum} number of features that can be extracted with
 \end{frame}
 
 \section{Spatial feature extaction}
-\label{sec:orgdb2a120}
-\begin{frame}[label={sec:orgb1e1b8d}]{Why spatial feature extraction?}
+\label{sec:org1451fb6}
+\begin{frame}[label={sec:org7675b42}]{Why spatial feature extraction?}
 \centerline{\begin{tabular}{ccc}
 \includegraphics[width=0.2\linewidth]{figures/rgb_house_shuffle} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_sort} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_original}\\
 \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist} & \includegraphics[width=0.2\linewidth]{figures/rgb_house_hist}
 \end{tabular}}
 \end{frame}
-\begin{frame}[label={sec:org33538e7}]{More on this topics}
+\begin{frame}[label={sec:org4738a72}]{More on this topics}
 \begin{center}
 \alert{Image analysis of hyperspectral data using mathematical morphology}
 \end{center}
@@ -998,8 +998,8 @@ Zenodo. \url{http://doi.org/10.5281/zenodo.437195}\\
 \end{frame}
 
 \subsection{Spatial filters}
-\label{sec:org107830b}
-\begin{frame}[label={sec:orgcc803f8}]{Spatial neighborhood}
+\label{sec:orgfda286d}
+\begin{frame}[label={sec:org8d85049}]{Spatial neighborhood}
 \begin{itemize}
 \item The neighborhood of a given pixel is the set of pixels that are connected to it.
 \item For a flat (grayscale) image :
@@ -1037,7 +1037,7 @@ Zenodo. \url{http://doi.org/10.5281/zenodo.437195}\\
 \end{itemize}
 \end{itemize}
 \end{frame}
-\begin{frame}[label={sec:orgfd5d692}]{Template filters}
+\begin{frame}[label={sec:orge07afeb}]{Template filters}
 \uline{Steps}:
 \begin{enumerate}
 \item Define the template  \(G\): 4/8-connected and size
@@ -1068,7 +1068,7 @@ Max Filter
         \draw[->,red,thick]  (4.25,4) -- (10.75,4);
       \end{tikzpicture}}}
 \end{frame}
-\begin{frame}[label={sec:orgf34fdad}]{Some filters}
+\begin{frame}[label={sec:org5c94c2f}]{Some filters}
 \begin{itemize}
 \item G = \(\begin{bmatrix} 1 & 1  & 1 \\1 & 1  & 1 \\1 & 1  & 1 \end{bmatrix}\), for a \(3\times 3\) neighborhood.
 \item Mean filter
@@ -1081,9 +1081,9 @@ $$\mathbf{x}^{r}(x,y) = \max_{i,j\in G}[\mathbf{x}(x+i,y+j)] - \min_{i,j\in G}[\
 $$\mathbf{x}^{m}(x,y) = \text{median}_{i,j\in G}[\mathbf{x}(x+i,y+j)]$$
 \end{itemize}
 \end{frame}
-\begin{frame}[fragile,label={sec:org8c42df5}]{Template filters in action 1/3}
+\begin{frame}[fragile,label={sec:org7a91296}]{Template filters in action 1/3}
  \begin{center}
-\alert{For multidimensional images: Use spectral feature extraction to get flat images!} See \ref{sec:org0fd5c86}
+\alert{For multidimensional images: Use spectral feature extraction to get flat images!} See \ref{sec:org9a32f21}
 \end{center}
 
 \begin{minted}[fontsize=\footnotesize,obeytabs=true,tabsize=4,bgcolor=bg]{sh}
@@ -1110,7 +1110,7 @@ done
 \end{minted}
 \end{frame}
 
-\begin{frame}[label={sec:org379c52c}]{Template filters in action 2/3}
+\begin{frame}[label={sec:org1b5aa2f}]{Template filters in action 2/3}
 \begin{center}
 \includegraphics[trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true,width=0.22\linewidth]{./figures/university_pc1.png}
 \end{center}
@@ -1130,7 +1130,7 @@ done
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:org13a6545}]{Template filters in action 3/3}
+\begin{frame}[label={sec:orgb4d0ff5}]{Template filters in action 3/3}
 \begin{center}
 \includegraphics[trim=2.944cm 8.832cm 2.944cm 10.304cm, clip=true,width=0.22\linewidth]{./figures/university_pc1.png}
 \end{center}
@@ -1151,8 +1151,8 @@ done
 \end{columns}
 \end{frame}
 \subsection{Mathematical morphology}
-\label{sec:orga702fe6}
-\begin{frame}[label={sec:org9cbbf65}]{Dilation and erosion}
+\label{sec:org0c4d98f}
+\begin{frame}[label={sec:org6ac5e70}]{Dilation and erosion}
 \begin{itemize}
 \item Mathematical morphology: non-linear image processing.
 \item A lot of applications in geoscience and remote sensing, see \cite{soille:pesaresi}
@@ -1181,7 +1181,7 @@ done
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orgebc88c3}]{Effets of structuring elements}
+\begin{frame}[label={sec:org93f7352}]{Effets of structuring elements}
 \begin{columns}
 \begin{column}{0.3\columnwidth}
 \begin{figure}[htbp]
@@ -1253,7 +1253,7 @@ done
 \end{columns}
 \end{frame}
 
-\begin{frame}[label={sec:org6647102}]{Opening and closing}
+\begin{frame}[label={sec:org3d7df90}]{Opening and closing}
 \begin{itemize}
 \item \uline{Opening}:
 \begin{itemize}
@@ -1308,7 +1308,7 @@ done
 \end{column}
 \end{columns}
 \end{frame}
-\begin{frame}[label={sec:orga8cdff5}]{Opening and closing profile}
+\begin{frame}[label={sec:org63ecdb8}]{Opening and closing profile}
 \begin{itemize}
 \item For a  given \(B\),  \(\gamma_{B}^r\)  (resp. \(\phi_{B}^r\))   indicates which clear (dark) objects fit \(B\).
 \begin{center}
@@ -1325,8 +1325,8 @@ done
 \end{itemize}
 \end{frame}
 \subsection{Extension to multivalued images}
-\label{sec:org0fd5c86}
-\begin{frame}[label={sec:orgb66eed4}]{Ordering relation}
+\label{sec:org9a32f21}
+\begin{frame}[label={sec:orga624884}]{Ordering relation}
 \begin{itemize}
 \item MM is based on \(\inf\) and \(\sup\) operators
 \item No unambiguous \(\inf\) / \(\sup\) for pixel/vector:
@@ -1339,8 +1339,8 @@ $$\mathbf{x}\mapsto h(x)$$
 \end{frame}
 
 \subsection{Questions}
-\label{sec:org112be15}
-\begin{frame}[fragile,label={sec:orgc5a7db6}]{Noise filtering}
+\label{sec:orgb51c08f}
+\begin{frame}[fragile,label={sec:org7e40851}]{Noise filtering}
  \begin{itemize}
 \item The image has been corrupted by a \emph{salt and pepper} noise, which filter should we use to filter it ?
 
@@ -1374,11 +1374,11 @@ $$\mathbf{x}\mapsto h(x)$$
 \end{frame}
 
 \section{References}
-\label{sec:org7beef6f}
+\label{sec:org325b547}
 \begin{frame}[fragile,allowframebreaks,label=]{Bibliography}
 \printbibliography
 \end{frame}
-\begin{frame}[label={sec:org6844e62}]{}
+\begin{frame}[label={sec:org5c176a2}]{}
 \begin{center}
 \tiny Creative Commons Attribution-ShareAlike 4.0 Unported License
 \normalsize
