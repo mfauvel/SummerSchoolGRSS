@@ -10,7 +10,6 @@ import rasterTools as rt
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.metrics import f1_score
-from sklearn.metrics import f1_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
