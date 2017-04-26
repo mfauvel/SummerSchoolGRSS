@@ -1,0 +1,52 @@
+%% Copyright (c) 2013-2016 Kazuki Maeda <kmaeda@kmaeda.net>
+%%
+%% Distributable under the MIT License:
+%% http://www.opensource.org/licenses/mit-license.php
+%%
+\ProvidesPackage{beamerthemeDarkConsole}[2013/05/16 ]
+%% Modified Mathieu Fauvel : 2016-11-11
+\mode<presentation>
+
+\RequirePackage{kmbeamer_common}
+
+\usecolortheme{DarkConsole}
+
+\def\familydefault{\ttdefault}
+
+\setbeamersize{text margin left=2mm,text margin right=2mm}
+
+\setbeamerfont{alerted text}{series=\normalfont}
+\setbeamerfont{structure}{series=\normalfont}
+\setbeamerfont{title}{size=\normalsize,series=\bfseries}
+\setbeamerfont{frametitle}{size=\normalsize,series=\normalfont}
+\setbeamerfont{block title}{size=\normalsize,series=\normalfont}
+\setbeamerfont{footline}{size*={5}{\z@},series=\bfseries}
+
+\setbeamertemplate{itemize item}{$\star$}
+\setbeamertemplate{itemize subitem}{$\star$}
+\setbeamertemplate{itemize subsubitem}{$\star$}
+\setbeamertemplate{frametitle}{{\usebeamercolor[fg]{normal text}\texttt{\mdseries >\hbox{}>\hbox{}> }}\insertframetitle}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{
+  \setbox\kmbmr@tmpboxa\hbox{[\ifnum\insertsectionnumber>0\boldmath\insertsectionnumber.~\insertsection\else\char"7E\fi]\$~\_}
+  \setbox\kmbmr@tmpboxb\hbox{[\insertframenumber/\inserttotalframenumber]}
+  \ht\kmbmr@tmpboxa=1mm\dp\kmbmr@tmpboxa=0mm
+  \ht\kmbmr@tmpboxb=1mm\dp\kmbmr@tmpboxb=0mm
+  \vspace{5.2mm}
+  \hspace{2mm}\noindent\box\kmbmr@tmpboxa\hfill\box\kmbmr@tmpboxb\hspace{2mm}
+  \vspace{1.3mm}
+}
+\setbeamertemplate{title page}{
+  \renewcommand\thefootnote{\fnsymbol{footnote}}
+  \setcounter{footnote}{1} % \dagger
+  \noindent \texttt{\mdseries >\hbox{}>\hbox{}> } {\usebeamerfont{title}\usebeamercolor[fg]{title}\bfseries\boldmath\inserttitle}
+  \ifx\insertsubtitle\@empty\else\\>\hbox{}>\hbox{}> {\usebeamerfont{title}\usebeamercolor[fg]{title}\insertsubtitle}\fi~\\[1em]
+  \insertauthor\ \ifx\insertinstitute\@empty\else(\insertinstitute)\fi\\
+  \renewcommand\thefootnote{\arabic{footnote}}
+  \setcounter{footnote}{0}
+}
+
+\mode
+<all>
+
+\endinput
