@@ -23,7 +23,7 @@ def skip_extrem(im):
 
 # Choose two bands for vizualisation in [0, 102]
 b1= 40
-b2= 50
+b2= 41
     
 # Load data set
 im,GeoT,Proj = rt.open_data('../Data/university.tif')
